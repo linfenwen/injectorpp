@@ -7,13 +7,13 @@ using injectorpp::InjectorCore;
 
 int main()
 {
-    Injector::initialize();
+    INJECTORPP_SETUP();
 
-    Address* mockAddress = Injector::getInstance()->fake<Address>();
+    Address* fakeAddress = INJECTORPP_FAKE<Address>();
 
-    std::cout << mockAddress->GetZipCode() << std::endl;
+    std::cout << fakeAddress->GetZipCode() << std::endl;
 
-    Injector::uninitialize();
+    INJECTORPP_CLEANUP();
 
     return 0;
 }

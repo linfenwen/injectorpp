@@ -1,5 +1,6 @@
 #include "injectorcore.h"
 #include <vector>
+#include "functionobject.h"
 
 int fakeReturnIntFunc()
 {
@@ -8,6 +9,51 @@ int fakeReturnIntFunc()
 
 namespace injectorpp
 {
+    std::string GetLastErrorStdStr()
+    {
+        DWORD error = GetLastError();
+        if (error)
+        {
+            LPVOID lpMsgBuf;
+            DWORD bufLen = FormatMessage(
+                FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                error,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                (LPTSTR)&lpMsgBuf,
+                0, NULL);
+            if (bufLen)
+            {
+                LPCSTR lpMsgStr = (LPCSTR)lpMsgBuf;
+                std::string result(lpMsgStr, lpMsgStr + bufLen);
+
+                LocalFree(lpMsgBuf);
+
+                return result;
+            }
+        }
+        return std::string();
+    }
+
+    BOOL __stdcall EnumParamsCallback(PSYMBOL_INFO inf, ULONG size, PVOID param)
+    {
+        // Transform the param back to the one it was before.
+        std::vector<std::string>* params = (std::vector<std::string>*)param;
+        if (inf == NULL)
+            return true;
+
+        // The flags contain various information on what type of symbol we have here
+        // SYMFLAG_PARAMETER says that its a function parameter.
+        if (inf->Flags & SYMFLAG_PARAMETER)
+        {
+            params->push_back(inf->Name);
+        }
+
+        return true;
+    }
+
     InjectorCore::InjectorCore()
     {
 
@@ -110,6 +156,40 @@ namespace injectorpp
             {
                 throw;
             }
+
+            PSYMBOL_INFO funcSym = this->allocSymbol(MAX_SYM_NAME);
+            /*if (SymFromNameW(hProcess, methodSymName, funcSym) == FALSE)
+            {
+                if (funcSym != NULL)
+                {
+                    delete funcSym;
+                    funcSym = NULL;
+                }
+
+                throw;
+            }*/
+
+            FunctionObject funcObj(funcSym);
+
+            /*std::vector<std::string> params;
+
+            IMAGEHLP_STACK_FRAME frame = { 0 };
+            frame.InstructionOffset = methodAddress;
+
+            
+
+            if (SymSetContext(hProcess, &frame, NULL) ==
+                FALSE && GetLastError() != ERROR_SUCCESS)
+            {
+                throw;
+            }
+
+            if (SymEnumSymbols(hProcess, 0, NULL,
+                EnumParamsCallback, (LPVOID)&params) == FALSE)
+            {
+                std::string errorText = GetLastErrorStdStr();
+                throw;
+            }*/
 
             std::wstring methodSymNameStr(methodSymName);
 

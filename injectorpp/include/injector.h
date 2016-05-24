@@ -72,4 +72,8 @@ namespace injectorpp
     Injector* Injector::m_instance = NULL;
 }
 
+#define INJECTORPP_SETUP() injectorpp::Injector::initialize()
+#define INJECTORPP_CLEANUP() injectorpp::Injector::uninitialize()
+#define INJECTORPP_FAKE injectorpp::Injector::getInstance()->fake
+
 #endif
