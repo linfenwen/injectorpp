@@ -10,6 +10,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "injectorpp_demo", "..\injec
 		{8F80038C-C13B-4649-B191-410DF0361B40} = {8F80038C-C13B-4649-B191-410DF0361B40}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmock", "..\gtest\googlemock\msvc\2015\gmock.vcxproj", "{34681F0D-CE45-415D-B5F2-5C662DFE3BD5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3C9E1A5E-2969-41B1-8981-547B0F79BB9F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "injectorpp_test", "..\injectorpp_test\injectorpp_test.vcxproj", "{E007552C-DD22-4BA8-B8A2-18B1A2C3A0AC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{34681F0D-CE45-415D-B5F2-5C662DFE3BD5} = {34681F0D-CE45-415D-B5F2-5C662DFE3BD5}
+		{8F80038C-C13B-4649-B191-410DF0361B40} = {8F80038C-C13B-4649-B191-410DF0361B40}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -34,8 +44,26 @@ Global
 		{DD74EF82-D894-4903-9282-FCB8ED290165}.Release|x64.Build.0 = Release|x64
 		{DD74EF82-D894-4903-9282-FCB8ED290165}.Release|x86.ActiveCfg = Release|Win32
 		{DD74EF82-D894-4903-9282-FCB8ED290165}.Release|x86.Build.0 = Release|Win32
+		{34681F0D-CE45-415D-B5F2-5C662DFE3BD5}.Debug|x64.ActiveCfg = Debug|Win32
+		{34681F0D-CE45-415D-B5F2-5C662DFE3BD5}.Debug|x86.ActiveCfg = Debug|Win32
+		{34681F0D-CE45-415D-B5F2-5C662DFE3BD5}.Debug|x86.Build.0 = Debug|Win32
+		{34681F0D-CE45-415D-B5F2-5C662DFE3BD5}.Release|x64.ActiveCfg = Release|Win32
+		{34681F0D-CE45-415D-B5F2-5C662DFE3BD5}.Release|x86.ActiveCfg = Release|Win32
+		{34681F0D-CE45-415D-B5F2-5C662DFE3BD5}.Release|x86.Build.0 = Release|Win32
+		{E007552C-DD22-4BA8-B8A2-18B1A2C3A0AC}.Debug|x64.ActiveCfg = Debug|x64
+		{E007552C-DD22-4BA8-B8A2-18B1A2C3A0AC}.Debug|x64.Build.0 = Debug|x64
+		{E007552C-DD22-4BA8-B8A2-18B1A2C3A0AC}.Debug|x86.ActiveCfg = Debug|Win32
+		{E007552C-DD22-4BA8-B8A2-18B1A2C3A0AC}.Debug|x86.Build.0 = Debug|Win32
+		{E007552C-DD22-4BA8-B8A2-18B1A2C3A0AC}.Release|x64.ActiveCfg = Release|x64
+		{E007552C-DD22-4BA8-B8A2-18B1A2C3A0AC}.Release|x64.Build.0 = Release|x64
+		{E007552C-DD22-4BA8-B8A2-18B1A2C3A0AC}.Release|x86.ActiveCfg = Release|Win32
+		{E007552C-DD22-4BA8-B8A2-18B1A2C3A0AC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{34681F0D-CE45-415D-B5F2-5C662DFE3BD5} = {3C9E1A5E-2969-41B1-8981-547B0F79BB9F}
+		{E007552C-DD22-4BA8-B8A2-18B1A2C3A0AC} = {3C9E1A5E-2969-41B1-8981-547B0F79BB9F}
 	EndGlobalSection
 EndGlobal
