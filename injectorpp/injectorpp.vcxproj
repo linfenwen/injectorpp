@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\FakeFunctions.h" />
     <ClInclude Include="include\FunctionResolver.h" />
     <ClInclude Include="include\InjectorCore.h" />
     <ClInclude Include="include\Injector.h" />

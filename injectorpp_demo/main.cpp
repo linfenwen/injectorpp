@@ -13,6 +13,10 @@ int main()
 
     std::cout << fakeAddress->GetZipCode() << std::endl;
 
+    std::cout << fakeAddress->GetCity() << std::endl;
+
+    std::cout << fakeAddress->GetCapitalCityByCountry("") << std::endl;
+
     INJECTORPP_CLEANUP();
 
     return 0;

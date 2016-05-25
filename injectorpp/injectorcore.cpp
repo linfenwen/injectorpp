@@ -1,11 +1,7 @@
 #include "InjectorCore.h"
 #include <vector>
 #include "FunctionResolver.h"
-
-int FakeReturnIntFunc()
-{
-    return 0;
-}
+#include "FakeFunctions.h"
 
 namespace InjectorPP
 {
@@ -64,60 +60,83 @@ namespace InjectorPP
 
         PSYMBOL_INFO sym = this->AllocSymbol(MAX_SYM_NAME);
 
-        std::vector<std::string> variables;
-
         HMODULE module = GetModuleHandle(0);
 
-        if (SymGetTypeFromName(hProcess, (ULONG64)module, "Address", sym) == FALSE)
+        std::string typeNameString(typeName);
+        std::string classSpecifier("class ");
+        std::string startStr = typeNameString.substr(0, classSpecifier.length());
+        if (startStr == classSpecifier)
         {
-            //std::string err = GetLastErrorStdStr();
-            throw;
-        }
+            // It's class type. Let's extract class name.
+            std::string className = typeNameString.substr(6);
 
-        DWORD numChildren = 0;
-        if (SymGetTypeInfo(hProcess, sym->ModBase, sym->TypeIndex, TI_GET_CHILDRENCOUNT, &numChildren) == FALSE)
-        {
-            //std::string err = GetLastErrorStdStr();
-            throw;
-        }
+            if (SymGetTypeFromName(hProcess, (ULONG64)module, className.c_str(), sym) == FALSE)
+            {
+                //std::string err = GetLastErrorStdStr();
+                throw;
+            }
 
-        // we are responsible for allocating enough space to hold numChildren values
-        TI_FINDCHILDREN_PARAMS* methods = (TI_FINDCHILDREN_PARAMS*)new char[sizeof(TI_FINDCHILDREN_PARAMS) + numChildren * sizeof(ULONG)];
-        methods->Count = numChildren;
-        methods->Start = 0;
+            DWORD numChildren = 0;
+            if (SymGetTypeInfo(hProcess, sym->ModBase, sym->TypeIndex, TI_GET_CHILDRENCOUNT, &numChildren) == FALSE)
+            {
+                //std::string err = GetLastErrorStdStr();
+                throw;
+            }
 
-        if (SymGetTypeInfo(hProcess, sym->ModBase, sym->TypeIndex, TI_FINDCHILDREN, methods) == FALSE)
-        {
-            throw;
-        }
+            // we are responsible for allocating enough space to hold numChildren values
+            TI_FINDCHILDREN_PARAMS* methods = (TI_FINDCHILDREN_PARAMS*)new char[sizeof(TI_FINDCHILDREN_PARAMS) + numChildren * sizeof(ULONG)];
+            methods->Count = numChildren;
+            methods->Start = 0;
 
-        // Retrieve all methods.
-        for (DWORD i = 0; i < numChildren; ++i)
-        {
-            ULONG curChild = methods->ChildId[i];
-
-            LPWSTR methodSymName = NULL;
-
-            // Let's get method's signature.
-            if (SymGetTypeInfo(hProcess, sym->ModBase, curChild, TI_GET_SYMNAME, &methodSymName) == FALSE)
+            if (SymGetTypeInfo(hProcess, sym->ModBase, sym->TypeIndex, TI_FINDCHILDREN, methods) == FALSE)
             {
                 throw;
             }
 
-            // Get method's address.
-            ULONG64 methodAddress = 0;
-            if (SymGetTypeInfo(hProcess, sym->ModBase, curChild, TI_GET_ADDRESS, &methodAddress) == FALSE)
+            // Retrieve all methods.
+            for (DWORD i = 0; i < numChildren; ++i)
             {
-                throw;
-            }
+                ULONG curChild = methods->ChildId[i];
 
-            FunctionResolver funcResolver(hProcess);
-            std::string returnType = funcResolver.ResolveReturnType(sym->ModBase, curChild);
+                LPWSTR methodSymName = NULL;
 
-            if (returnType == "signed __int32")
-            {
+                // Let's get method's signature.
+                if (SymGetTypeInfo(hProcess, sym->ModBase, curChild, TI_GET_SYMNAME, &methodSymName) == FALSE)
+                {
+                    throw;
+                }
+
+                // Get method's address.
+                ULONG64 methodAddress = 0;
+                if (SymGetTypeInfo(hProcess, sym->ModBase, curChild, TI_GET_ADDRESS, &methodAddress) == FALSE)
+                {
+                    throw;
+                }
+
+                FunctionResolver funcResolver(hProcess);
+                std::string returnType = funcResolver.ResolveReturnType(sym->ModBase, curChild);
+
+                std::string fakeFuncName;
+                if (returnType == "std::basic_string<char,std::char_traits<char>,std::allocator<char> >")
+                {
+                    fakeFuncName = "FakeReturnStringFunc";
+                }
+                else if (returnType == "signed __int32")
+                {
+                    fakeFuncName = "FakeReturnIntFunc";
+                }
+                else if (returnType == "char*")
+                {
+                    fakeFuncName = "FakeReturnCCharFunc";
+                }
+
+                if (fakeFuncName.empty())
+                {
+                    continue;
+                }
+
                 PSYMBOL_INFO funcSym = this->AllocSymbol(MAX_SYM_NAME);
-                if (SymGetTypeFromName(hProcess, (ULONG64)module, "FakeReturnIntFunc", funcSym) == FALSE)
+                if (SymGetTypeFromName(hProcess, (ULONG64)module, fakeFuncName.c_str(), funcSym) == FALSE)
                 {
                     if (funcSym != NULL)
                     {
@@ -139,6 +158,10 @@ namespace InjectorPP
                 HOOKHANDLE mhh;
                 this->HookFunc(methodAddress, funcSymAddress, &mhh);
             }
+        }
+        else
+        {
+            // TODO: Add other type support.
         }
 
         typeInstance = malloc(typeSize);
