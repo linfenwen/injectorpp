@@ -1,26 +1,12 @@
-#include <iostream>
-#include "injector.h"
-#include "address.h"
+#include "gmock/gmock.h"
 
-using InjectorPP::Injector;
-using InjectorPP::InjectorCore;
-
-int main()
+int main(int argc, char** argv)
 {
-    INJECTORPP_SETUP();
+    testing::InitGoogleMock(&argc, argv);
 
-    Address* fakeAddress = INJECTORPP_FAKE<Address>();
+    int result = RUN_ALL_TESTS();
 
-    // Will return 0 instead of the real implementation!
-    std::cout << fakeAddress->GetZipCode() << std::endl;
+    getchar();
 
-    // Will return "" instead of the real implementation!
-    std::cout << fakeAddress->GetCity() << std::endl;
-
-    // Will return "" instead of the real implementation!
-    std::cout << fakeAddress->GetCapitalCityByCountry("") << std::endl;
-
-    INJECTORPP_CLEANUP();
-
-    return 0;
+    return result;
 }
