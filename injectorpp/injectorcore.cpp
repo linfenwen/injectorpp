@@ -1,62 +1,16 @@
-#include "injectorcore.h"
+#include "InjectorCore.h"
 #include <vector>
-#include "functionobject.h"
+#include "FunctionResolver.h"
 
-int fakeReturnIntFunc()
+int FakeReturnIntFunc()
 {
     return 0;
 }
 
-namespace injectorpp
+namespace InjectorPP
 {
-    std::string GetLastErrorStdStr()
-    {
-        DWORD error = GetLastError();
-        if (error)
-        {
-            LPVOID lpMsgBuf;
-            DWORD bufLen = FormatMessage(
-                FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                FORMAT_MESSAGE_FROM_SYSTEM |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL,
-                error,
-                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                (LPTSTR)&lpMsgBuf,
-                0, NULL);
-            if (bufLen)
-            {
-                LPCSTR lpMsgStr = (LPCSTR)lpMsgBuf;
-                std::string result(lpMsgStr, lpMsgStr + bufLen);
-
-                LocalFree(lpMsgBuf);
-
-                return result;
-            }
-        }
-        return std::string();
-    }
-
-    BOOL __stdcall EnumParamsCallback(PSYMBOL_INFO inf, ULONG size, PVOID param)
-    {
-        // Transform the param back to the one it was before.
-        std::vector<std::string>* params = (std::vector<std::string>*)param;
-        if (inf == NULL)
-            return true;
-
-        // The flags contain various information on what type of symbol we have here
-        // SYMFLAG_PARAMETER says that its a function parameter.
-        if (inf->Flags & SYMFLAG_PARAMETER)
-        {
-            params->push_back(inf->Name);
-        }
-
-        return true;
-    }
-
     InjectorCore::InjectorCore()
     {
-
     }
 
     InjectorCore::~InjectorCore()
@@ -77,7 +31,7 @@ namespace injectorpp
     // srcFunc - The address of the function to changed from.
     // targetFunc - The address of the destination function.
     // hookHandle - The inter-mid result during margic changing.
-    void InjectorCore::hookFunc(ULONG64 srcFunc, ULONG64 targetFunc, HOOKHANDLE *hookHandle)
+    void InjectorCore::HookFunc(ULONG64 srcFunc, ULONG64 targetFunc, HOOKHANDLE *hookHandle)
     {
         hookHandle->addr = srcFunc;
 
@@ -101,14 +55,14 @@ namespace injectorpp
         WriteProcessMemory((HANDLE)-1, (void*)hookHandle->addr, hookHandle->jmp, 6, 0);
     }
 
-    void* InjectorCore::fake(const char* typeName, size_t typeSize)
+    void* InjectorCore::Fake(const char* typeName, size_t typeSize)
     {
         void* typeInstance = nullptr;
 
         HANDLE hProcess = GetCurrentProcess();
         BOOL ret = SymInitialize(hProcess, NULL, TRUE);
 
-        PSYMBOL_INFO sym = this->allocSymbol(MAX_SYM_NAME);
+        PSYMBOL_INFO sym = this->AllocSymbol(MAX_SYM_NAME);
 
         std::vector<std::string> variables;
 
@@ -157,47 +111,13 @@ namespace injectorpp
                 throw;
             }
 
-            PSYMBOL_INFO funcSym = this->allocSymbol(MAX_SYM_NAME);
-            /*if (SymFromNameW(hProcess, methodSymName, funcSym) == FALSE)
+            FunctionResolver funcResolver(hProcess);
+            std::string returnType = funcResolver.ResolveReturnType(sym->ModBase, curChild);
+
+            if (returnType == "signed __int32")
             {
-                if (funcSym != NULL)
-                {
-                    delete funcSym;
-                    funcSym = NULL;
-                }
-
-                throw;
-            }*/
-
-            FunctionObject funcObj(funcSym);
-
-            /*std::vector<std::string> params;
-
-            IMAGEHLP_STACK_FRAME frame = { 0 };
-            frame.InstructionOffset = methodAddress;
-
-            
-
-            if (SymSetContext(hProcess, &frame, NULL) ==
-                FALSE && GetLastError() != ERROR_SUCCESS)
-            {
-                throw;
-            }
-
-            if (SymEnumSymbols(hProcess, 0, NULL,
-                EnumParamsCallback, (LPVOID)&params) == FALSE)
-            {
-                std::string errorText = GetLastErrorStdStr();
-                throw;
-            }*/
-
-            std::wstring methodSymNameStr(methodSymName);
-
-            std::wstring getZipCodeMethodName(L"Address::GetZipCode");
-            if (methodSymNameStr == getZipCodeMethodName)
-            {
-                PSYMBOL_INFO funcSym = this->allocSymbol(MAX_SYM_NAME);
-                if (SymGetTypeFromName(hProcess, (ULONG64)module, "fakeReturnIntFunc", funcSym) == FALSE)
+                PSYMBOL_INFO funcSym = this->AllocSymbol(MAX_SYM_NAME);
+                if (SymGetTypeFromName(hProcess, (ULONG64)module, "FakeReturnIntFunc", funcSym) == FALSE)
                 {
                     if (funcSym != NULL)
                     {
@@ -217,19 +137,9 @@ namespace injectorpp
                 }
 
                 HOOKHANDLE mhh;
-                hookFunc(methodAddress, funcSymAddress, &mhh);
+                this->HookFunc(methodAddress, funcSymAddress, &mhh);
             }
         }
-        /*if (SymGetTypeFromName(hProcess, (ULONG64)module, "?GetCountry@Address@@QAE?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ", sym) == FALSE)
-        {
-        std::string err = GetLastErrorStdStr();
-        return p;
-        }*/
-
-        /*GetLocalVariables(variables, sym->Address);
-
-        BasicType bt = (BasicType)1;
-        SymGetTypeInfo(hProcess, sym->ModBase, sym->TypeIndex, TI_GET_BASETYPE, &bt);*/
 
         typeInstance = malloc(typeSize);
         memset(typeInstance, 0, typeSize);
@@ -240,7 +150,7 @@ namespace injectorpp
         return typeInstance;
     }
 
-    PSYMBOL_INFO InjectorCore::allocSymbol(int nameLen)
+    PSYMBOL_INFO InjectorCore::AllocSymbol(int nameLen)
     {
         void* space = malloc(sizeof(SYMBOL_INFO) + nameLen);
         memset(space, 0, sizeof(SYMBOL_INFO) + nameLen);

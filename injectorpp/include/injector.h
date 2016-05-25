@@ -3,7 +3,7 @@
 
 #include "injectorcore.h"
 
-namespace injectorpp
+namespace InjectorPP
 {
     class Injector
     {
@@ -19,7 +19,7 @@ namespace injectorpp
 
         // Get the single instance of Injector.
         // This method is non-thread safe.
-        static Injector* getInstance()
+        static Injector* GetInstance()
         {
             if (m_instance == 0)
             {
@@ -29,7 +29,7 @@ namespace injectorpp
             return m_instance;
         }
 
-        static void initialize()
+        static void Initialize()
         {
             if (m_instance == NULL)
             {
@@ -37,7 +37,7 @@ namespace injectorpp
             }
         }
 
-        static void uninitialize()
+        static void Uninitialize()
         {
             if (m_instance != NULL)
             {
@@ -47,9 +47,9 @@ namespace injectorpp
         }
 
         template <typename T>
-        T* fake()
+        T* Fake()
         {
-            return static_cast<T*>(this->m_injectorCore->fake(typeid(T).name(), sizeof(T)));
+            return static_cast<T*>(this->m_injectorCore->Fake(typeid(T).name(), sizeof(T)));
         }
     private:
         Injector()
@@ -72,8 +72,8 @@ namespace injectorpp
     Injector* Injector::m_instance = NULL;
 }
 
-#define INJECTORPP_SETUP() injectorpp::Injector::initialize()
-#define INJECTORPP_CLEANUP() injectorpp::Injector::uninitialize()
-#define INJECTORPP_FAKE injectorpp::Injector::getInstance()->fake
+#define INJECTORPP_SETUP() InjectorPP::Injector::Initialize()
+#define INJECTORPP_CLEANUP() InjectorPP::Injector::Uninitialize()
+#define INJECTORPP_FAKE InjectorPP::Injector::GetInstance()->Fake
 
 #endif

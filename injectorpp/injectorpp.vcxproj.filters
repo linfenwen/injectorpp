@@ -21,15 +21,21 @@
     <ClInclude Include="include\injectorcore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\functionobject.h">
+    <ClInclude Include="include\functionresolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FunctionResolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="injectorcore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="functionobject.cpp">
+    <ClCompile Include="Utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

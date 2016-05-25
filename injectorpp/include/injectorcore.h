@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace injectorpp
+namespace InjectorPP
 {
     class InjectorCore
     {
@@ -27,14 +27,14 @@ namespace injectorpp
         // srcFunc - The address of the function to changed from.
         // targetFunc - The address of the destination function.
         // hookHandle - The inter-mid result during margic changing.
-        void hookFunc(ULONG64 srcFunc, ULONG64 targetFunc, HOOKHANDLE *hookHandle);
+        void HookFunc(ULONG64 srcFunc, ULONG64 targetFunc, HOOKHANDLE *hookHandle);
 
-        void* fake(const char* typeName, size_t typeSize);
+        void* Fake(const char* typeName, size_t typeSize);
 
     private:
         InjectorCore(const InjectorCore&);
 
-        PSYMBOL_INFO allocSymbol(int nameLen);
+        PSYMBOL_INFO AllocSymbol(int nameLen);
 
         std::vector<void*> m_allocatedTypeInstances;
     };

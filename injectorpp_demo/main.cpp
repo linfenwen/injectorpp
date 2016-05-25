@@ -2,8 +2,8 @@
 #include "injector.h"
 #include "address.h"
 
-using injectorpp::Injector;
-using injectorpp::InjectorCore;
+using InjectorPP::Injector;
+using InjectorPP::InjectorCore;
 
 int main()
 {

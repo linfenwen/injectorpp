@@ -126,13 +126,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\functionobject.h" />
-    <ClInclude Include="include\injectorcore.h" />
-    <ClInclude Include="include\injector.h" />
+    <ClInclude Include="include\FunctionResolver.h" />
+    <ClInclude Include="include\InjectorCore.h" />
+    <ClInclude Include="include\Injector.h" />
+    <ClInclude Include="include\Utility.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="functionobject.cpp" />
-    <ClCompile Include="injectorcore.cpp" />
+    <ClCompile Include="FunctionResolver.cpp" />
+    <ClCompile Include="InjectorCore.cpp" />
+    <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
