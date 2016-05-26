@@ -2,6 +2,7 @@
 #define INJECTORPP_BEHAVIORCHANGER_H
 
 #include <Windows.h>
+#include <vector>
 
 namespace InjectorPP
 {
@@ -20,6 +21,11 @@ namespace InjectorPP
         void ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue);
     private:
         BehaviorChanger(const BehaviorChanger&);
+
+        std::vector<char*> m_allocatedCharBuff;
+        std::vector<ULONG> m_allocatedCharBuffAddress;
+
+        const int MAX_CHAR_BUFF_SIZE = 1024 * 1024 * 1024;
     };
 }
 
