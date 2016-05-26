@@ -2,6 +2,8 @@
 #define INJECTORPP_CORE_H
 
 #include "injectorcore.h"
+#include <iostream>
+#include <intrin.h>
 
 namespace InjectorPP
 {
@@ -75,5 +77,15 @@ namespace InjectorPP
 #define INJECTORPP_SETUP() InjectorPP::Injector::Initialize()
 #define INJECTORPP_CLEANUP() InjectorPP::Injector::Uninitialize()
 #define INJECTORPP_FAKE InjectorPP::Injector::GetInstance()->Fake
+
+#define WHEN_CALLED(...) \
+	__INTERNAL_WHEN_CALLED(__VA_ARGS__, #__VA_ARGS__)
+
+#define __INTERNAL_WHEN_CALLED(function, function_call_name) \
+{\
+__nop(); \
+int __action = 0; \
+std::cout << function_call_name << std::endl;\
+}
 
 #endif

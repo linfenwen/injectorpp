@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\BehaviorChanger.h" />
     <ClInclude Include="include\FakeFunctions.h" />
     <ClInclude Include="include\FunctionResolver.h" />
     <ClInclude Include="include\InjectorCore.h" />
@@ -133,6 +134,7 @@
     <ClInclude Include="include\Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BehaviorChanger.cpp" />
     <ClCompile Include="FunctionResolver.cpp" />
     <ClCompile Include="InjectorCore.cpp" />
     <ClCompile Include="Utility.cpp" />

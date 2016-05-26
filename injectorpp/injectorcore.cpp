@@ -6,11 +6,14 @@
 namespace InjectorPP
 {
     InjectorCore::InjectorCore()
+        :m_behaviorChanger(NULL)
     {
+        this->m_behaviorChanger = new BehaviorChanger();
     }
 
     InjectorCore::~InjectorCore()
     {
+        // Release all allocated type instances.
         std::vector<void*>::iterator it;
         for (it = this->m_allocatedTypeInstances.begin(); it != this->m_allocatedTypeInstances.end(); ++it)
         {
@@ -20,35 +23,24 @@ namespace InjectorPP
                 *it = NULL;
             }
         }
-    }
 
-    // A magic function to change the function behavior at runtime
-    //
-    // srcFunc - The address of the function to changed from.
-    // targetFunc - The address of the destination function.
-    // hookHandle - The inter-mid result during margic changing.
-    void InjectorCore::HookFunc(ULONG64 srcFunc, ULONG64 targetFunc, HOOKHANDLE *hookHandle)
-    {
-        hookHandle->addr = srcFunc;
+        // Release all allocated symbol info.
+        std::vector<PSYMBOL_INFO>::iterator symbolInfoIterator;
+        for (symbolInfoIterator = this->m_allocatedSymbolInfos.begin();
+        symbolInfoIterator != this->m_allocatedSymbolInfos.end(); ++symbolInfoIterator)
+        {
+            if (*symbolInfoIterator != NULL)
+            {
+                delete *symbolInfoIterator;
+                *symbolInfoIterator = NULL;
+            }
+        }
 
-        // jmp
-        hookHandle->jmp[0] = 0xE9;
-
-        // ret
-        hookHandle->jmp[5] = 0xC3;
-
-        // Read original opcode from source function memory.
-        ReadProcessMemory((HANDLE)-1, (void*)hookHandle->addr, hookHandle->origcode, 6, 0);
-
-        // Calculate the offset address of target function.
-        ULONG64 calc = targetFunc - hookHandle->addr - 5;
-
-        // Fill the offset address for jmp command.
-        memcpy(&hookHandle->jmp[1], &calc, 4);
-
-        // Write the 'jmp targetFunctionAddress; ret' command to the original
-        // function address.
-        WriteProcessMemory((HANDLE)-1, (void*)hookHandle->addr, hookHandle->jmp, 6, 0);
+        if (this->m_behaviorChanger != NULL)
+        {
+            delete m_behaviorChanger;
+            m_behaviorChanger = NULL;
+        }
     }
 
     void* InjectorCore::Fake(const char* typeName, size_t typeSize)
@@ -135,28 +127,22 @@ namespace InjectorPP
                     continue;
                 }
 
-                PSYMBOL_INFO funcSym = this->AllocSymbol(MAX_SYM_NAME);
-                if (SymGetTypeFromName(hProcess, (ULONG64)module, fakeFuncName.c_str(), funcSym) == FALSE)
-                {
-                    if (funcSym != NULL)
-                    {
-                        delete funcSym;
-                        funcSym = NULL;
-                    }
+                FakeReturnCCharFunc();
 
-                    throw;
+                if (fakeFuncName == "FakeReturnIntFunc")
+                {
+                    this->m_behaviorChanger->ChangeFunctionReturnValue(methodAddress, 0);
                 }
 
-                // intfunc's address.
-                ULONG64 funcSymAddress = funcSym->Address;
-                if (funcSym != NULL)
+                if (fakeFuncName == "FakeReturnCCharFunc")
                 {
-                    delete funcSym;
-                    funcSym = NULL;
+                    this->m_behaviorChanger->ChangeFunctionReturnValue(methodAddress, "");
                 }
 
-                HOOKHANDLE mhh;
-                this->HookFunc(methodAddress, funcSymAddress, &mhh);
+                if (fakeFuncName == "FakeReturnStringFunc")
+                {
+                    this->m_behaviorChanger->ChangeFunctionReturnValue(methodAddress, "");
+                }
             }
         }
         else
@@ -167,7 +153,7 @@ namespace InjectorPP
         typeInstance = malloc(typeSize);
         memset(typeInstance, 0, typeSize);
 
-        // Store the new instance. We'll delete it in de-constructor.
+        // Store the new instance. We'll delete it in the de-constructor.
         this->m_allocatedTypeInstances.push_back(typeInstance);
 
         return typeInstance;
@@ -179,9 +165,13 @@ namespace InjectorPP
         memset(space, 0, sizeof(SYMBOL_INFO) + nameLen);
         PSYMBOL_INFO sym = reinterpret_cast<PSYMBOL_INFO>(space);
         sym->NameLen = nameLen;
+        
         // SizeOfStruct is ment to point at the actual size of the struct and not
         // of the whole memory allocated
         sym->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+        // Store the new symbol info poitner. We'll delete it in the de-constructor.
+        this->m_allocatedSymbolInfos.push_back(sym);
 
         return sym;
     }

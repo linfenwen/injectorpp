@@ -29,7 +29,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithIntReturnDefaultVal
     EXPECT_EQ(expected, actual);
 }
 
-TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithCCharReturnDefaultValue)
+/*TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithCCharReturnDefaultValue)
 {
     // Prepare
     Address* fakeAddress = INJECTORPP_FAKE<Address>();
@@ -53,4 +53,17 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithStringReturnDefault
 
     // Assert
     EXPECT_EQ(expected, actual);
+}*/
+
+extern int fakeReturnIntFuncReturnValue;
+
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWhenCalled)
+{
+    // Prepare
+    Address* fakeAddress = INJECTORPP_FAKE<Address>();
+    //WHEN_CALLED(fakeAddress->GetZipCode())
+
+    int test = fakeAddress->GetZipCode();
+
+    std::cout << test << std::endl;
 }
