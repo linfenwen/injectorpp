@@ -127,19 +127,17 @@ namespace InjectorPP
                     continue;
                 }
 
-                FakeReturnCCharFunc();
+                char* ddd = FakeReturnCCharFunc();
 
                 if (fakeFuncName == "FakeReturnIntFunc")
                 {
                     this->m_behaviorChanger->ChangeFunctionReturnValue(methodAddress, 0);
                 }
-
-                if (fakeFuncName == "FakeReturnCCharFunc")
+                else if (fakeFuncName == "FakeReturnCCharFunc")
                 {
                     this->m_behaviorChanger->ChangeFunctionReturnValue(methodAddress, "");
                 }
-
-                if (fakeFuncName == "FakeReturnStringFunc")
+                else if (fakeFuncName == "FakeReturnStringFunc")
                 {
                     this->m_behaviorChanger->ChangeFunctionReturnValue(methodAddress, "");
                 }

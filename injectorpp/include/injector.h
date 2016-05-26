@@ -53,6 +53,16 @@ namespace InjectorPP
         {
             return static_cast<T*>(this->m_injectorCore->Fake(typeid(T).name(), sizeof(T)));
         }
+
+        void Return(int expectedReturnValue)
+        {
+            // TODO:
+        }
+
+        void Return(std::string expectedReturnValue)
+        {
+            // TODO:
+        }
     private:
         Injector()
         {
@@ -84,8 +94,7 @@ namespace InjectorPP
 #define __INTERNAL_WHEN_CALLED(function, function_call_name) \
 {\
 __nop(); \
-int __action = 0; \
-std::cout << function_call_name << std::endl;\
-}
+}\
+(*InjectorPP::Injector::GetInstance())
 
 #endif

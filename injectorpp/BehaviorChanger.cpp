@@ -9,6 +9,15 @@ namespace InjectorPP
 
     BehaviorChanger::~BehaviorChanger()
     {
+        std::vector<char*>::iterator it;
+        for (it = this->m_allocatedCharBuff.begin(); it != this->m_allocatedCharBuff.end(); ++it)
+        {
+            if (*it != NULL)
+            {
+                delete *it;
+                *it = NULL;
+            }
+        }
     }
 
     // A magic function to change the function behavior at runtime
@@ -47,13 +56,32 @@ namespace InjectorPP
 
     void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue)
     {
-        // TODO:
+        // Allocate a new buff to store the expected return value.
+        char* newCharBuff = new char[MAX_CHAR_BUFF_SIZE];
+        strcpy_s(newCharBuff, MAX_CHAR_BUFF_SIZE, expectedReturnValue);
+        
+        // Store the new buff to a vector so that it can be released in the de-constructor.
+        this->m_allocatedCharBuff.push_back(newCharBuff);
 
-        /*char* tt = new char[4];
-        tt[0] = 'h';
-        tt[1] = 'j';
-        tt[2] = 'k';
-        tt[3] = '\0';*/
+        // IMPORTANT: Why we need to store the address of the newly allocated buff
+        // to a class data member?
+        //
+        // newCharBuff is a local variable, whose memory cannot be accessed outside
+        // of BehaviorChanger::ChangeFunctionReturnValue. If we inject the address of
+        // newCharBuff to the real function, a memory access violation will occur when
+        // the real function is called.
+        //
+        // m_allocatedCharBuffAddress is the data member of BehaviorChanger, whose memory
+        // address can be accessed outside of BehaviorChanger::ChangeFunctionReturnValue (of
+        // cause, from language perspective, m_allocatedCharBuffAddress cannot be accessed
+        // outside of class BehaviorChanger, but it is not from Operating System's perspective. 
+        // There's no memory protection for class accesibility for the OS.
+        //
+        // When push_back called, m_allocatedCharBuffAddress allocate a new memory to store the
+        // value of newCharBuff's address, and that new memory storage will be held and accessible
+        // by any other function until BehaviorChanger class de-constructed. That's the whole purpose
+        // of storing the newCharBuff's address to a vector data member of a class.
+        this->m_allocatedCharBuffAddress.push_back((ULONG)newCharBuff);
 
         /*void* shellcodeStart;
         void* shellcodeEnd;
@@ -62,7 +90,7 @@ namespace InjectorPP
                 mov shellcodeEnd, offset shellcode_end
                 jmp shellcode_end
                 shellcode_start :
-            mov eax, dword ptr[tt]
+            mov eax, [addr]
                 ret
                 shellcode_end :
         }
@@ -76,13 +104,21 @@ namespace InjectorPP
             printf("%02x \n", *start);
         }*/
 
-        /*byte asmCommand[5];
-        asmCommand[0] = 0x8B;
-        asmCommand[1] = 0x86;
-        asmCommand[2] = 0x43;
-        asmCommand[3] = 0x08;
-        asmCommand[4] = 0x8B;
+        byte asmCommand[6];
 
-        WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCommand, 5, 0);*/
+        // mov
+        asmCommand[0] = 0xA1;
+
+        // OK, we need to retreive the address of latest element, which holds the
+        // address of newCharBuff.
+        asmCommand[1] = ((ULONG)&this->m_allocatedCharBuffAddress.back()) & 0xFF;
+        asmCommand[2] = (((ULONG)&this->m_allocatedCharBuffAddress.back()) >> 8) & 0xFF;
+        asmCommand[3] = (((ULONG)&this->m_allocatedCharBuffAddress.back()) >> 16) & 0xFF;
+        asmCommand[4] = (((ULONG)&this->m_allocatedCharBuffAddress.back()) >> 24) & 0xFF;
+
+        // ret
+        asmCommand[5] = 0xC3;
+
+        WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCommand, 6, 0);
     }
 }
