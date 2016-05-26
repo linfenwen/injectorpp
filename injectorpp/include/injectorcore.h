@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "BehaviorChanger.h"
+
 namespace InjectorPP
 {
     class InjectorCore
@@ -15,20 +17,6 @@ namespace InjectorPP
 
         ~InjectorCore();
 
-        struct HOOKHANDLE
-        {
-            ULONG64 addr;
-            char origcode[6];
-            BYTE jmp[6];
-        };
-
-        // A magic function to change the function behavior at runtime
-        //
-        // srcFunc - The address of the function to changed from.
-        // targetFunc - The address of the destination function.
-        // hookHandle - The inter-mid result during margic changing.
-        void HookFunc(ULONG64 srcFunc, ULONG64 targetFunc, HOOKHANDLE *hookHandle);
-
         void* Fake(const char* typeName, size_t typeSize);
 
     private:
@@ -37,6 +25,10 @@ namespace InjectorPP
         PSYMBOL_INFO AllocSymbol(int nameLen);
 
         std::vector<void*> m_allocatedTypeInstances;
+
+        std::vector<PSYMBOL_INFO> m_allocatedSymbolInfos;
+
+        BehaviorChanger* m_behaviorChanger;
     };
 }
 
