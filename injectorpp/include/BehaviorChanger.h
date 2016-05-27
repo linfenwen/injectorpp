@@ -25,7 +25,7 @@ namespace InjectorPP
         std::vector<char*> m_allocatedCharBuff;
         std::vector<ULONG> m_allocatedCharBuffAddress;
 
-        const int MAX_CHAR_BUFF_SIZE = 1024 * 1024 * 1024;
+        const int MAX_CHAR_BUFF_SIZE = 1024 * 1024;
     };
 }
 

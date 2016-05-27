@@ -16,6 +16,7 @@ public:
     static string GetCapitalCityByCountry(string country);
 
     Address() {};
+    int GetMyCode();
     void SetCountry(string country);
     string GetCountry();
     void GetCountryByReference(string& country);

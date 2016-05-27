@@ -2,6 +2,7 @@
 #include <vector>
 #include "FunctionResolver.h"
 #include "FakeFunctions.h"
+#include "Utility.h"
 
 namespace InjectorPP
 {
@@ -108,6 +109,9 @@ namespace InjectorPP
                 FunctionResolver funcResolver(hProcess);
                 std::string returnType = funcResolver.ResolveReturnType(sym->ModBase, curChild);
 
+                // Store function symbol and address mapping.
+                this->AddFunctionSymbolAddressMapping(methodSymName, methodAddress);
+
                 std::string fakeFuncName;
                 if (returnType == "std::basic_string<char,std::char_traits<char>,std::allocator<char> >")
                 {
@@ -126,8 +130,6 @@ namespace InjectorPP
                 {
                     continue;
                 }
-
-                char* ddd = FakeReturnCCharFunc();
 
                 if (fakeFuncName == "FakeReturnIntFunc")
                 {
@@ -155,6 +157,77 @@ namespace InjectorPP
         this->m_allocatedTypeInstances.push_back(typeInstance);
 
         return typeInstance;
+    }
+
+    void InjectorCore::AddFunctionSymbolAddressMapping(const wchar_t* funcSymbol, const ULONG64& address)
+    {
+        std::string funcSymbolName = Utility::W2M(funcSymbol);
+
+        if (this->m_funcSymAddressMapping.find(funcSymbolName) != this->m_funcSymAddressMapping.end())
+        {
+            // The same symbol name already added.
+            return;
+        }
+
+        this->m_funcSymAddressMapping.insert(std::make_pair(funcSymbolName, address));
+    }
+
+    void InjectorCore::ChangeFunctionReturnValue(const std::string& funcCallCode, const int& expectedReturnValue)
+    {
+        // Extract function name.
+        std::string functionSignature = funcCallCode.substr(funcCallCode.find("->") + 2);
+        std::string functionName = functionSignature.substr(0, functionSignature.find("("));
+
+        ULONG64 funcAddress = 0;
+        std::map<std::string, ULONG64>::const_iterator it = this->m_funcSymAddressMapping.begin();
+        for (; it != this->m_funcSymAddressMapping.end(); ++it)
+        {
+            // OK, OK. I know this logic is silly.
+            // We need to opimize the whole method for querying function address.
+            //
+            // TODO: We may believe in the full symbol of funciton.
+            if (it->first.find(functionName) != std::string::npos)
+            {
+                funcAddress = it->second;
+
+                break;
+            }
+        }
+
+        if (funcAddress == 0)
+        {
+            throw;
+        }
+
+        this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue);
+    }
+
+    void InjectorCore::ChangeFunctionReturnValue(const std::string& funcCallCode, const char* expectedReturnValue)
+    {
+        // Extract function name.
+        std::string functionSignature = funcCallCode.substr(funcCallCode.find("->") + 2);
+        std::string functionName = functionSignature.substr(0, functionSignature.find("("));
+
+        ULONG64 funcAddress = 0;
+        std::map<std::string, ULONG64>::const_iterator it = this->m_funcSymAddressMapping.begin();
+        for (; it != this->m_funcSymAddressMapping.end(); ++it)
+        {
+            // OK, OK. I know this logic is silly.
+            // We need to opimize the whole method for querying function address.
+            //
+            // TODO: We may believe in the full symbol of funciton.
+            if (it->first.find(functionName))
+            {
+                funcAddress = it->second;
+            }
+        }
+
+        if (funcAddress == 0)
+        {
+            throw;
+        }
+
+        this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue);
     }
 
     PSYMBOL_INFO InjectorCore::AllocSymbol(int nameLen)
