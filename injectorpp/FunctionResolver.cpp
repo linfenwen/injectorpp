@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "FunctionResolver.h"
+#include "Utility.h"
 
 namespace InjectorPP
 {
@@ -90,16 +91,37 @@ namespace InjectorPP
     {
     }
 
+    FunctionResolver::~FunctionResolver()
+    {
+    }
+
     void FunctionResolver::Resolve(const ULONG64& modBase, const ULONG& typeIndex, Function& resolvedFunction)
     {
+        // Get function's memory address.
+        ULONG64 functionAddress = 0;
+        if (SymGetTypeInfo(this->m_hProcess, modBase, typeIndex, TI_GET_ADDRESS, &functionAddress) == FALSE)
+        {
+            throw;
+        }
+
+        // Get function's symbol name.
+        LPWSTR functionSymName;
+        if (SymGetTypeInfo(this->m_hProcess, modBase, typeIndex, TI_GET_SYMNAME, &functionSymName) == FALSE)
+        {
+            throw;
+        }
+
+        // Get function's return type.
         std::string returnType = this->ResolveReturnType(modBase, typeIndex);
         
+        // Get function's parameters.
         std::vector<FunctionParameter> parameters;
         this->ResolveParameters(modBase, typeIndex, parameters);
 
-        resolvedFunction.Name = ""; // TODO
+        resolvedFunction.Name = Utility::W2M(functionSymName);
         resolvedFunction.Parameters = parameters;
         resolvedFunction.ReturnType = returnType;
+        resolvedFunction.Address = functionAddress;
     }
 
     std::string FunctionResolver::ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex)
@@ -123,6 +145,8 @@ namespace InjectorPP
 
     void FunctionResolver::ResolveParameters(const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters)
     {
+        // TODO:
+
         /*if (SymGetTypeFromName(hProcess, (ULONG64)module, "?GetCountry@Address@@QAE?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ", sym) == FALSE)
         {
         std::string err = GetLastErrorStdStr();

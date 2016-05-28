@@ -42,6 +42,12 @@
     <ClInclude Include="include\Function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ClassResolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SymbolInfoHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FunctionResolver.cpp">
@@ -54,6 +60,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BehaviorChanger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClassResolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SymbolInfoHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

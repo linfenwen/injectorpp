@@ -14,6 +14,8 @@ namespace InjectorPP
         // Pass process handle to constructor.
         FunctionResolver(HANDLE processHandle);
 
+        virtual ~FunctionResolver();
+
         virtual void Resolve(const ULONG64& modBase, const ULONG& typeIndex, Function& resolvedFunction);
 
     protected:

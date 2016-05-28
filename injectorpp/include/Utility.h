@@ -2,6 +2,7 @@
 #define INJECTORPP_UTILITY_H
 
 #include <string>
+#include <vector>
 
 namespace InjectorPP
 {
@@ -10,7 +11,6 @@ namespace InjectorPP
     public:
         static std::string GetLastErrorStdStr();
         static std::string W2M(const wchar_t* str);
-
     private:
         Utility();
         ~Utility();

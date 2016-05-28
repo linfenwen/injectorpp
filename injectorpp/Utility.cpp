@@ -1,5 +1,5 @@
-#include "Utility.h"
 #include <Windows.h>
+#include "Utility.h"
 
 namespace InjectorPP
 {

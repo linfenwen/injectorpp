@@ -9,6 +9,8 @@
 
 #include "BehaviorChanger.h"
 #include "IFunctionResolver.h"
+#include "IClassResolver.h"
+#include "SymbolInfoHelper.h"
 
 namespace InjectorPP
 {
@@ -27,21 +29,23 @@ namespace InjectorPP
     private:
         InjectorCore(const InjectorCore&);
 
-        PSYMBOL_INFO AllocSymbol(int nameLen);
-
-        void AddFunctionSymbolAddressMapping(const wchar_t* funcSymbol, const ULONG64& address);
+        void AddFunctionSymbolAddressMapping(const std::string& funcSymbol, const ULONG64& address);
 
         std::vector<void*> m_allocatedTypeInstances;
-
-        std::vector<PSYMBOL_INFO> m_allocatedSymbolInfos;
 
         std::map<std::string, ULONG64> m_funcSymAddressMapping;
 
         BehaviorChanger* m_behaviorChanger;
 
+        IClassResolver* m_classResolver;
+
         IFunctionResolver* m_functionResolver;
 
+        SymbolInfoHelper* m_symbolInfoHelper;
+
         HANDLE m_currentProcessHandler;
+
+        static bool m_isSymInitialized;
     };
 }
 
