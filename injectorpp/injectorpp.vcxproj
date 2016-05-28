@@ -127,16 +127,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\BehaviorChanger.h" />
+    <ClInclude Include="include\ClassResolver.h" />
     <ClInclude Include="include\FakeFunctions.h" />
+    <ClInclude Include="include\Function.h" />
     <ClInclude Include="include\FunctionResolver.h" />
+    <ClInclude Include="include\IClassResolver.h" />
+    <ClInclude Include="include\IFunctionResolver.h" />
     <ClInclude Include="include\InjectorCore.h" />
     <ClInclude Include="include\Injector.h" />
+    <ClInclude Include="include\SymbolInfoHelper.h" />
     <ClInclude Include="include\Utility.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BehaviorChanger.cpp" />
+    <ClCompile Include="ClassResolver.cpp" />
     <ClCompile Include="FunctionResolver.cpp" />
     <ClCompile Include="InjectorCore.cpp" />
+    <ClCompile Include="SymbolInfoHelper.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

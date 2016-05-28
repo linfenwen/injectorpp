@@ -103,4 +103,9 @@ char* Address::GetZipCode(char *country, char *streetName)
     throw;
 }
 
+int Address::GetMyCode()
+{
+    return -2;
+}
+
 

@@ -4,6 +4,7 @@
 #include "injectorcore.h"
 #include <iostream>
 #include <intrin.h>
+#include <stack>
 
 namespace InjectorPP
 {
@@ -54,14 +55,35 @@ namespace InjectorPP
             return static_cast<T*>(this->m_injectorCore->Fake(typeid(T).name(), sizeof(T)));
         }
 
+        void PushWhenCalledFunction(const std::string& funcCallCode)
+        {
+            this->m_whenCalledFuncCode.push(funcCallCode);
+        }
+        
         void Return(int expectedReturnValue)
         {
-            // TODO:
+            if (this->m_whenCalledFuncCode.empty())
+            {
+                throw;
+            }
+
+            std::string funcCallCode = this->m_whenCalledFuncCode.top();
+            this->m_whenCalledFuncCode.pop();
+
+            this->m_injectorCore->ChangeFunctionReturnValue(funcCallCode, expectedReturnValue);
         }
 
-        void Return(std::string expectedReturnValue)
+        void Return(char* expectedReturnValue)
         {
-            // TODO:
+            if (this->m_whenCalledFuncCode.empty())
+            {
+                throw;
+            }
+
+            std::string funcCallCode = this->m_whenCalledFuncCode.top();
+            this->m_whenCalledFuncCode.pop();
+
+            this->m_injectorCore->ChangeFunctionReturnValue(funcCallCode, expectedReturnValue);
         }
     private:
         Injector()
@@ -79,6 +101,8 @@ namespace InjectorPP
         static Injector* m_instance;
 
         InjectorCore* m_injectorCore;
+
+        std::stack<std::string> m_whenCalledFuncCode;
     };
 
     Injector* Injector::m_instance = NULL;
@@ -94,6 +118,7 @@ namespace InjectorPP
 #define __INTERNAL_WHEN_CALLED(function, function_call_name) \
 {\
 __nop(); \
+InjectorPP::Injector::GetInstance()->PushWhenCalledFunction(function_call_name); \
 }\
 (*InjectorPP::Injector::GetInstance())
 

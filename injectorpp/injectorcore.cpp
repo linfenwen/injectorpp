@@ -1,14 +1,26 @@
 #include "InjectorCore.h"
 #include <vector>
+#include "ClassResolver.h"
 #include "FunctionResolver.h"
 #include "FakeFunctions.h"
+#include "Utility.h"
 
 namespace InjectorPP
 {
+    bool InjectorCore::m_isSymInitialized = false;
+
     InjectorCore::InjectorCore()
-        :m_behaviorChanger(NULL)
+        :m_behaviorChanger(NULL),
+        m_classResolver(NULL),
+        m_functionResolver(NULL),
+        m_symbolInfoHelper(NULL),
+        m_currentProcessHandler(NULL)
     {
+        this->m_currentProcessHandler = GetCurrentProcess();
         this->m_behaviorChanger = new BehaviorChanger();
+        this->m_functionResolver = new FunctionResolver(this->m_currentProcessHandler);
+        this->m_classResolver = new ClassResolver(this->m_currentProcessHandler, this->m_functionResolver);
+        this->m_symbolInfoHelper = new SymbolInfoHelper();
     }
 
     InjectorCore::~InjectorCore()
@@ -24,16 +36,22 @@ namespace InjectorPP
             }
         }
 
-        // Release all allocated symbol info.
-        std::vector<PSYMBOL_INFO>::iterator symbolInfoIterator;
-        for (symbolInfoIterator = this->m_allocatedSymbolInfos.begin();
-        symbolInfoIterator != this->m_allocatedSymbolInfos.end(); ++symbolInfoIterator)
+        if (this->m_symbolInfoHelper != NULL)
         {
-            if (*symbolInfoIterator != NULL)
-            {
-                delete *symbolInfoIterator;
-                *symbolInfoIterator = NULL;
-            }
+            delete this->m_symbolInfoHelper;
+            this->m_symbolInfoHelper = NULL;
+        }
+
+        if (this->m_classResolver != NULL)
+        {
+            delete this->m_classResolver;
+            this->m_classResolver = NULL;
+        }
+
+        if (this->m_functionResolver != NULL)
+        {
+            delete this->m_functionResolver;
+            this->m_functionResolver = NULL;
         }
 
         if (this->m_behaviorChanger != NULL)
@@ -45,16 +63,27 @@ namespace InjectorPP
 
     void* InjectorCore::Fake(const char* typeName, size_t typeSize)
     {
+        if (!InjectorCore::m_isSymInitialized)
+        {
+            // Let's initialize the whole symbol system.
+            if (SymInitialize(this->m_currentProcessHandler, NULL, TRUE) == FALSE)
+            {
+                throw;
+            }
+
+            InjectorCore::m_isSymInitialized = true;
+        }
+
         void* typeInstance = nullptr;
 
-        HANDLE hProcess = GetCurrentProcess();
-        BOOL ret = SymInitialize(hProcess, NULL, TRUE);
+        // Allocate a symbol entity to store top level symbol info.
+        PSYMBOL_INFO sym = this->m_symbolInfoHelper->AllocSymbol();
 
-        PSYMBOL_INFO sym = this->AllocSymbol(MAX_SYM_NAME);
-
+        // Get current executing module handle.
         HMODULE module = GetModuleHandle(0);
 
         std::string typeNameString(typeName);
+        
         std::string classSpecifier("class ");
         std::string startStr = typeNameString.substr(0, classSpecifier.length());
         if (startStr == classSpecifier)
@@ -62,84 +91,27 @@ namespace InjectorPP
             // It's class type. Let's extract class name.
             std::string className = typeNameString.substr(6);
 
-            if (SymGetTypeFromName(hProcess, (ULONG64)module, className.c_str(), sym) == FALSE)
+            std::vector<Function> resolvedMethods;
+            this->m_classResolver->ResolveMethods((ULONG64)module, className, resolvedMethods);
+
+            std::vector<Function>::iterator resolvedMethodIterator = resolvedMethods.begin();
+            for (; resolvedMethodIterator != resolvedMethods.end(); ++resolvedMethodIterator)
             {
-                //std::string err = GetLastErrorStdStr();
-                throw;
-            }
+                // Store function symbol and address mapping.
+                this->AddFunctionSymbolAddressMapping((*resolvedMethodIterator).Name, (*resolvedMethodIterator).Address);
 
-            DWORD numChildren = 0;
-            if (SymGetTypeInfo(hProcess, sym->ModBase, sym->TypeIndex, TI_GET_CHILDRENCOUNT, &numChildren) == FALSE)
-            {
-                //std::string err = GetLastErrorStdStr();
-                throw;
-            }
-
-            // we are responsible for allocating enough space to hold numChildren values
-            TI_FINDCHILDREN_PARAMS* methods = (TI_FINDCHILDREN_PARAMS*)new char[sizeof(TI_FINDCHILDREN_PARAMS) + numChildren * sizeof(ULONG)];
-            methods->Count = numChildren;
-            methods->Start = 0;
-
-            if (SymGetTypeInfo(hProcess, sym->ModBase, sym->TypeIndex, TI_FINDCHILDREN, methods) == FALSE)
-            {
-                throw;
-            }
-
-            // Retrieve all methods.
-            for (DWORD i = 0; i < numChildren; ++i)
-            {
-                ULONG curChild = methods->ChildId[i];
-
-                LPWSTR methodSymName = NULL;
-
-                // Let's get method's signature.
-                if (SymGetTypeInfo(hProcess, sym->ModBase, curChild, TI_GET_SYMNAME, &methodSymName) == FALSE)
+                if ((*resolvedMethodIterator).ReturnType == "std::basic_string<char,std::char_traits<char>,std::allocator<char> >")
                 {
-                    throw;
+                    // TODO: std::string won't work here.
+                    this->m_behaviorChanger->ChangeFunctionReturnValue((*resolvedMethodIterator).Address, "");
                 }
-
-                // Get method's address.
-                ULONG64 methodAddress = 0;
-                if (SymGetTypeInfo(hProcess, sym->ModBase, curChild, TI_GET_ADDRESS, &methodAddress) == FALSE)
+                else if ((*resolvedMethodIterator).ReturnType == "signed __int32")
                 {
-                    throw;
+                    this->m_behaviorChanger->ChangeFunctionReturnValue((*resolvedMethodIterator).Address, 0);
                 }
-
-                FunctionResolver funcResolver(hProcess);
-                std::string returnType = funcResolver.ResolveReturnType(sym->ModBase, curChild);
-
-                std::string fakeFuncName;
-                if (returnType == "std::basic_string<char,std::char_traits<char>,std::allocator<char> >")
+                else if ((*resolvedMethodIterator).ReturnType == "char*")
                 {
-                    fakeFuncName = "FakeReturnStringFunc";
-                }
-                else if (returnType == "signed __int32")
-                {
-                    fakeFuncName = "FakeReturnIntFunc";
-                }
-                else if (returnType == "char*")
-                {
-                    fakeFuncName = "FakeReturnCCharFunc";
-                }
-
-                if (fakeFuncName.empty())
-                {
-                    continue;
-                }
-
-                char* ddd = FakeReturnCCharFunc();
-
-                if (fakeFuncName == "FakeReturnIntFunc")
-                {
-                    this->m_behaviorChanger->ChangeFunctionReturnValue(methodAddress, 0);
-                }
-                else if (fakeFuncName == "FakeReturnCCharFunc")
-                {
-                    this->m_behaviorChanger->ChangeFunctionReturnValue(methodAddress, "");
-                }
-                else if (fakeFuncName == "FakeReturnStringFunc")
-                {
-                    this->m_behaviorChanger->ChangeFunctionReturnValue(methodAddress, "");
+                    this->m_behaviorChanger->ChangeFunctionReturnValue((*resolvedMethodIterator).Address, "");
                 }
             }
         }
@@ -148,6 +120,7 @@ namespace InjectorPP
             // TODO: Add other type support.
         }
 
+        // Allocate memory for the type.
         typeInstance = malloc(typeSize);
         memset(typeInstance, 0, typeSize);
 
@@ -157,20 +130,72 @@ namespace InjectorPP
         return typeInstance;
     }
 
-    PSYMBOL_INFO InjectorCore::AllocSymbol(int nameLen)
+    void InjectorCore::AddFunctionSymbolAddressMapping(const std::string& funcSymbol, const ULONG64& address)
     {
-        void* space = malloc(sizeof(SYMBOL_INFO) + nameLen);
-        memset(space, 0, sizeof(SYMBOL_INFO) + nameLen);
-        PSYMBOL_INFO sym = reinterpret_cast<PSYMBOL_INFO>(space);
-        sym->NameLen = nameLen;
-        
-        // SizeOfStruct is ment to point at the actual size of the struct and not
-        // of the whole memory allocated
-        sym->SizeOfStruct = sizeof(SYMBOL_INFO);
+        if (this->m_funcSymAddressMapping.find(funcSymbol) != this->m_funcSymAddressMapping.end())
+        {
+            // The same symbol name already added.
+            return;
+        }
 
-        // Store the new symbol info poitner. We'll delete it in the de-constructor.
-        this->m_allocatedSymbolInfos.push_back(sym);
+        this->m_funcSymAddressMapping.insert(std::make_pair(funcSymbol, address));
+    }
 
-        return sym;
+    void InjectorCore::ChangeFunctionReturnValue(const std::string& funcCallCode, const int& expectedReturnValue)
+    {
+        // Extract function name.
+        std::string functionSignature = funcCallCode.substr(funcCallCode.find("->") + 2);
+        std::string functionName = functionSignature.substr(0, functionSignature.find("("));
+
+        ULONG64 funcAddress = 0;
+        std::map<std::string, ULONG64>::const_iterator it = this->m_funcSymAddressMapping.begin();
+        for (; it != this->m_funcSymAddressMapping.end(); ++it)
+        {
+            // OK, OK. I know this logic is silly.
+            // We need to opimize the whole method for querying function address.
+            //
+            // TODO: We may believe in the full symbol of funciton.
+            if (it->first.find(functionName) != std::string::npos)
+            {
+                funcAddress = it->second;
+
+                break;
+            }
+        }
+
+        if (funcAddress == 0)
+        {
+            throw;
+        }
+
+        this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue);
+    }
+
+    void InjectorCore::ChangeFunctionReturnValue(const std::string& funcCallCode, const char* expectedReturnValue)
+    {
+        // Extract function name.
+        std::string functionSignature = funcCallCode.substr(funcCallCode.find("->") + 2);
+        std::string functionName = functionSignature.substr(0, functionSignature.find("("));
+
+        ULONG64 funcAddress = 0;
+        std::map<std::string, ULONG64>::const_iterator it = this->m_funcSymAddressMapping.begin();
+        for (; it != this->m_funcSymAddressMapping.end(); ++it)
+        {
+            // OK, OK. I know this logic is silly.
+            // We need to opimize the whole method for querying function address.
+            //
+            // TODO: We may believe in the full symbol of funciton.
+            if (it->first.find(functionName))
+            {
+                funcAddress = it->second;
+            }
+        }
+
+        if (funcAddress == 0)
+        {
+            throw;
+        }
+
+        this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue);
     }
 }

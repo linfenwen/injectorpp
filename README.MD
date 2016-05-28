@@ -1,9 +1,9 @@
 # Injector++
 
-Injector++ is a library to help you fake non-virtual methods, static methods and global functions.
+Injector++ is a library to help you fake non-virtual methods, static methods and global functions withou change existing code.
 
 ## How to use
-It's extremely easy to mock class methods via Injector++. Just one line code:
+It's extremely easy to mock all methods of a class via Injector++. Just one line of code:
 
 ```cpp
 Address* fakeAddress = INJECTORPP_FAKE<Address>();
@@ -49,6 +49,17 @@ TEST_F(AddressTestFixture, MyTest)
 
 ```
 Just put INJECTORPP_SETUP() into Setup() and put INJECTORPP_CLEANUP() into TearDown(). You're ready!
+
+More over, to specific a return value for a method is simple as well:
+
+```cpp
+Address* fakeAddress = INJECTORPP_FAKE<Address>();
+
+WHEN_CALLED(fakeAddress->GetMyCode()).Return(100);
+
+// myCode will always be 100.
+int myCode = fakeAddress->GetMyCode();
+```
 
 ## Prerequisites
 1. Injector++ only supports Windows by now. Linux support will be added soon.

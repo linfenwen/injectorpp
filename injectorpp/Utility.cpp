@@ -1,5 +1,5 @@
-#include "Utility.h"
 #include <Windows.h>
+#include "Utility.h"
 
 namespace InjectorPP
 {
@@ -38,5 +38,27 @@ namespace InjectorPP
         }
 
         return std::string();
+    }
+
+    std::string Utility::W2M(const wchar_t* str)
+    {
+        int muLen = WideCharToMultiByte(CP_ACP, 0, str, -1, NULL, 0, NULL, NULL);
+        if (muLen == 0)
+        {
+            return "";
+        }
+
+        char* muValue = new char[muLen];
+        int nRet = WideCharToMultiByte(CP_ACP, 0, str, -1, muValue, muLen, NULL, NULL);
+        if (nRet == 0)
+        {
+            delete[] muValue;
+            return "";
+        }
+
+        std::string temp = muValue;
+        delete[] muValue;
+
+        return temp;
     }
 }
