@@ -128,7 +128,10 @@
   <ItemGroup>
     <ClInclude Include="include\BehaviorChanger.h" />
     <ClInclude Include="include\FakeFunctions.h" />
+    <ClInclude Include="include\Function.h" />
     <ClInclude Include="include\FunctionResolver.h" />
+    <ClInclude Include="include\IClassResolver.h" />
+    <ClInclude Include="include\IFunctionResolver.h" />
     <ClInclude Include="include\InjectorCore.h" />
     <ClInclude Include="include\Injector.h" />
     <ClInclude Include="include\Utility.h" />

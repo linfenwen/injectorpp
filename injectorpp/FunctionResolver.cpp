@@ -1,5 +1,8 @@
-#include "functionresolver.h"
+#include <Windows.h>
+#include <DbgHelp.h>
 #include <sstream>
+
+#include "FunctionResolver.h"
 
 namespace InjectorPP
 {
@@ -85,6 +88,18 @@ namespace InjectorPP
     FunctionResolver::FunctionResolver(HANDLE processHandle)
         : m_hProcess(processHandle)
     {
+    }
+
+    void FunctionResolver::Resolve(const ULONG64& modBase, const ULONG& typeIndex, Function& resolvedFunction)
+    {
+        std::string returnType = this->ResolveReturnType(modBase, typeIndex);
+        
+        std::vector<FunctionParameter> parameters;
+        this->ResolveParameters(modBase, typeIndex, parameters);
+
+        resolvedFunction.Name = ""; // TODO
+        resolvedFunction.Parameters = parameters;
+        resolvedFunction.ReturnType = returnType;
     }
 
     std::string FunctionResolver::ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex)

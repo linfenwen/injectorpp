@@ -8,6 +8,7 @@
 #include <map>
 
 #include "BehaviorChanger.h"
+#include "IFunctionResolver.h"
 
 namespace InjectorPP
 {
@@ -37,6 +38,10 @@ namespace InjectorPP
         std::map<std::string, ULONG64> m_funcSymAddressMapping;
 
         BehaviorChanger* m_behaviorChanger;
+
+        IFunctionResolver* m_functionResolver;
+
+        HANDLE m_currentProcessHandler;
     };
 }
 

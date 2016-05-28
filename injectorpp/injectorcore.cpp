@@ -7,9 +7,13 @@
 namespace InjectorPP
 {
     InjectorCore::InjectorCore()
-        :m_behaviorChanger(NULL)
+        :m_behaviorChanger(NULL),
+        m_functionResolver(NULL),
+        m_currentProcessHandler(NULL)
     {
+        this->m_currentProcessHandler = GetCurrentProcess();
         this->m_behaviorChanger = new BehaviorChanger();
+        this->m_functionResolver = new FunctionResolver(m_currentProcessHandler);
     }
 
     InjectorCore::~InjectorCore()
@@ -42,14 +46,19 @@ namespace InjectorPP
             delete m_behaviorChanger;
             m_behaviorChanger = NULL;
         }
+
+        if (this->m_functionResolver != NULL)
+        {
+            delete this->m_functionResolver;
+            this->m_functionResolver = NULL;
+        }
     }
 
     void* InjectorCore::Fake(const char* typeName, size_t typeSize)
     {
         void* typeInstance = nullptr;
 
-        HANDLE hProcess = GetCurrentProcess();
-        BOOL ret = SymInitialize(hProcess, NULL, TRUE);
+        BOOL ret = SymInitialize(this->m_currentProcessHandler, NULL, TRUE);
 
         PSYMBOL_INFO sym = this->AllocSymbol(MAX_SYM_NAME);
 
@@ -63,14 +72,14 @@ namespace InjectorPP
             // It's class type. Let's extract class name.
             std::string className = typeNameString.substr(6);
 
-            if (SymGetTypeFromName(hProcess, (ULONG64)module, className.c_str(), sym) == FALSE)
+            if (SymGetTypeFromName(this->m_currentProcessHandler, (ULONG64)module, className.c_str(), sym) == FALSE)
             {
                 //std::string err = GetLastErrorStdStr();
                 throw;
             }
 
             DWORD numChildren = 0;
-            if (SymGetTypeInfo(hProcess, sym->ModBase, sym->TypeIndex, TI_GET_CHILDRENCOUNT, &numChildren) == FALSE)
+            if (SymGetTypeInfo(this->m_currentProcessHandler, sym->ModBase, sym->TypeIndex, TI_GET_CHILDRENCOUNT, &numChildren) == FALSE)
             {
                 //std::string err = GetLastErrorStdStr();
                 throw;
@@ -81,7 +90,7 @@ namespace InjectorPP
             methods->Count = numChildren;
             methods->Start = 0;
 
-            if (SymGetTypeInfo(hProcess, sym->ModBase, sym->TypeIndex, TI_FINDCHILDREN, methods) == FALSE)
+            if (SymGetTypeInfo(this->m_currentProcessHandler, sym->ModBase, sym->TypeIndex, TI_FINDCHILDREN, methods) == FALSE)
             {
                 throw;
             }
@@ -94,20 +103,22 @@ namespace InjectorPP
                 LPWSTR methodSymName = NULL;
 
                 // Let's get method's signature.
-                if (SymGetTypeInfo(hProcess, sym->ModBase, curChild, TI_GET_SYMNAME, &methodSymName) == FALSE)
+                if (SymGetTypeInfo(this->m_currentProcessHandler, sym->ModBase, curChild, TI_GET_SYMNAME, &methodSymName) == FALSE)
                 {
                     throw;
                 }
 
                 // Get method's address.
                 ULONG64 methodAddress = 0;
-                if (SymGetTypeInfo(hProcess, sym->ModBase, curChild, TI_GET_ADDRESS, &methodAddress) == FALSE)
+                if (SymGetTypeInfo(this->m_currentProcessHandler, sym->ModBase, curChild, TI_GET_ADDRESS, &methodAddress) == FALSE)
                 {
                     throw;
                 }
 
-                FunctionResolver funcResolver(hProcess);
-                std::string returnType = funcResolver.ResolveReturnType(sym->ModBase, curChild);
+                Function resolvedFunction;
+                this->m_functionResolver->Resolve(sym->ModBase, curChild, resolvedFunction);
+
+                std::string returnType = resolvedFunction.ReturnType;
 
                 // Store function symbol and address mapping.
                 this->AddFunctionSymbolAddressMapping(methodSymName, methodAddress);

@@ -1,31 +1,26 @@
 #ifndef INJECTORPP_FUNCTIONRESOLVER_H
 #define INJECTORPP_FUNCTIONRESOLVER_H
 
-#include <Windows.h>
-#include <DbgHelp.h>
-#include <string>
 #include <vector>
+#include "IFunctionResolver.h"
 
 namespace InjectorPP
 {
     enum BasicType;
 
-    struct FunctionParameter
-    {
-        std::string Name;
-        std::string Type;
-    };
-
-    class FunctionResolver
+    class FunctionResolver : public IFunctionResolver
     {
     public:
         // Pass process handle to constructor.
         FunctionResolver(HANDLE processHandle);
 
-        // Resolve the function return type.
-        std::string ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex);
+        virtual void Resolve(const ULONG64& modBase, const ULONG& typeIndex, Function& resolvedFunction);
 
-        void ResolveParameters(const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters);
+    protected:
+        // Resolve the function return type.
+        virtual std::string ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex);
+
+        virtual void ResolveParameters(const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters);
     private:
         // Disable copy constructor.
         FunctionResolver(const FunctionResolver&);

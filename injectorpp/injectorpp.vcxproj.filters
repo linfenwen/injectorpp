@@ -33,6 +33,15 @@
     <ClInclude Include="include\BehaviorChanger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\IFunctionResolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IClassResolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FunctionResolver.cpp">
