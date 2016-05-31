@@ -29,7 +29,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithIntReturnDefaultVal
     EXPECT_EQ(expected, actual);
 }
 
-/*TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithCCharReturnDefaultValue)
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithCCharReturnDefaultValue)
 {
     // Prepare
     Address* fakeAddress = INJECTORPP_FAKE<Address>();
@@ -42,7 +42,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithIntReturnDefaultVal
 
     // Assert
     EXPECT_EQ(std::string(expected), std::string(actual));
-}*/
+}
 
 /*TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithStringReturnDefaultValue)
 {

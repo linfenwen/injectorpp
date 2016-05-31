@@ -22,7 +22,7 @@ namespace InjectorPP
         // Resolve the function return type.
         virtual std::string ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex);
 
-        virtual void ResolveParameters(const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters);
+        virtual void ResolveParameters(const ULONG64& functionAddress, const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters);
     private:
         // Disable copy constructor.
         FunctionResolver(const FunctionResolver&);
