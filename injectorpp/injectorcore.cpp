@@ -36,6 +36,17 @@ namespace InjectorPP
             }
         }
 
+        // Release all fake classes.
+        std::vector<Class*>::iterator classIt;
+        for (classIt = this->m_resolvedClasses.begin(); classIt != this->m_resolvedClasses.end(); ++classIt)
+        {
+            if (*classIt != NULL)
+            {
+                delete *classIt;
+                *classIt = NULL;
+            }
+        }
+
         if (this->m_symbolInfoHelper != NULL)
         {
             delete this->m_symbolInfoHelper;
@@ -88,18 +99,19 @@ namespace InjectorPP
         std::string startStr = typeNameString.substr(0, classSpecifier.length());
         if (startStr == classSpecifier)
         {
+            Class* cls = new Class();
+
             // It's class type. Let's extract class name.
-            std::string className = typeNameString.substr(6);
+            cls->Name = typeNameString.substr(6);
 
-            std::vector<Function> resolvedMethods;
-            this->m_classResolver->ResolveMethods((ULONG64)module, className, resolvedMethods);
+            this->m_classResolver->ResolveMethods((ULONG64)module, cls->Name, cls->Methods);
 
-            std::vector<Function>::iterator resolvedMethodIterator = resolvedMethods.begin();
-            for (; resolvedMethodIterator != resolvedMethods.end(); ++resolvedMethodIterator)
+            // Store the new class.
+            this->m_resolvedClasses.push_back(cls);
+
+            std::vector<Function>::iterator resolvedMethodIterator = cls->Methods.begin();
+            for (; resolvedMethodIterator != cls->Methods.end(); ++resolvedMethodIterator)
             {
-                // Store function symbol and address mapping.
-                this->AddFunctionSymbolAddressMapping((*resolvedMethodIterator).Name, (*resolvedMethodIterator).Address);
-
                 if ((*resolvedMethodIterator).ReturnType == "std::basic_string<char,std::char_traits<char>,std::allocator<char> >")
                 {
                     // TODO: std::string won't work here.
@@ -130,72 +142,64 @@ namespace InjectorPP
         return typeInstance;
     }
 
-    void InjectorCore::AddFunctionSymbolAddressMapping(const std::string& funcSymbol, const ULONG64& address)
-    {
-        if (this->m_funcSymAddressMapping.find(funcSymbol) != this->m_funcSymAddressMapping.end())
-        {
-            // The same symbol name already added.
-            return;
-        }
-
-        this->m_funcSymAddressMapping.insert(std::make_pair(funcSymbol, address));
-    }
-
     void InjectorCore::ChangeFunctionReturnValue(const std::string& funcCallCode, const int& expectedReturnValue)
     {
-        // Extract function name.
-        std::string functionSignature = funcCallCode.substr(funcCallCode.find("->") + 2);
-        std::string functionName = functionSignature.substr(0, functionSignature.find("("));
-
         ULONG64 funcAddress = 0;
-        std::map<std::string, ULONG64>::const_iterator it = this->m_funcSymAddressMapping.begin();
-        for (; it != this->m_funcSymAddressMapping.end(); ++it)
-        {
-            // OK, OK. I know this logic is silly.
-            // We need to opimize the whole method for querying function address.
-            //
-            // TODO: We may believe in the full symbol of funciton.
-            if (it->first.find(functionName) != std::string::npos)
-            {
-                funcAddress = it->second;
-
-                break;
-            }
-        }
-
-        if (funcAddress == 0)
-        {
-            throw;
-        }
+        this->GetFunctionAddressByFunctionCallCode(funcCallCode, funcAddress);
 
         this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue);
     }
 
     void InjectorCore::ChangeFunctionReturnValue(const std::string& funcCallCode, const char* expectedReturnValue)
     {
+        ULONG64 funcAddress = 0;
+        this->GetFunctionAddressByFunctionCallCode(funcCallCode, funcAddress);
+
+        this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue);
+    }
+
+    void InjectorCore::GetFunctionAddressByFunctionCallCode(const std::string& funcCallCode, ULONG64& funcAddress)
+    {
         // Extract function name.
         std::string functionSignature = funcCallCode.substr(funcCallCode.find("->") + 2);
         std::string functionName = functionSignature.substr(0, functionSignature.find("("));
 
-        ULONG64 funcAddress = 0;
-        std::map<std::string, ULONG64>::const_iterator it = this->m_funcSymAddressMapping.begin();
-        for (; it != this->m_funcSymAddressMapping.end(); ++it)
+        size_t leftBrackeIndex = functionSignature.find("(");
+        size_t paramterStringCount = functionSignature.find(")") - leftBrackeIndex - 1;
+        
+        size_t parameterCount = 0;
+        if (paramterStringCount != 0)
         {
-            // OK, OK. I know this logic is silly.
-            // We need to opimize the whole method for querying function address.
-            //
-            // TODO: We may believe in the full symbol of funciton.
-            if (it->first.find(functionName))
+            std::string functionParameters = functionSignature.substr(leftBrackeIndex + 1, functionSignature.find(")") - leftBrackeIndex - 1);
+
+            // Find parameter count.
+            std::vector<std::string> splittedParameters = Utility::Split(functionParameters, ',');
+
+            parameterCount = splittedParameters.size();
+        }
+
+        funcAddress = 0;
+
+        Class* cls = this->m_resolvedClasses[0];
+
+        std::vector<Function>::const_iterator it = cls->Methods.begin();
+        for (; it != cls->Methods.end(); ++it)
+        {
+            if (it->RawName != functionName)
             {
-                funcAddress = it->second;
+                continue;
             }
-        }
 
-        if (funcAddress == 0)
-        {
-            throw;
-        }
+            if (it->Parameters.size() != parameterCount)
+            {
+                continue;
+            }
 
-        this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue);
+            // TODO: parameter identify.
+
+            funcAddress = it->Address;
+
+            break;
+        }
     }
 }

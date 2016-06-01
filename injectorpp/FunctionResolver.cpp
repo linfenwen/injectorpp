@@ -131,6 +131,17 @@ namespace InjectorPP
         this->ResolveParameters(functionAddress, modBase, typeIndex, parameters);
 
         resolvedFunction.Name = Utility::W2M(functionSymName);
+
+        size_t scopeIdentifierIndex = resolvedFunction.Name.find("::");
+        if (scopeIdentifierIndex != std::string::npos)
+        {
+            resolvedFunction.RawName = resolvedFunction.Name.substr(scopeIdentifierIndex + 2);
+        }
+        else
+        {
+            resolvedFunction.RawName = resolvedFunction.Name;
+        }
+
         resolvedFunction.Parameters = parameters;
         resolvedFunction.ReturnType = returnType;
         resolvedFunction.Address = functionAddress;

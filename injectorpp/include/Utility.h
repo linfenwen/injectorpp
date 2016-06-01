@@ -11,6 +11,8 @@ namespace InjectorPP
     public:
         static std::string GetLastErrorStdStr();
         static std::string W2M(const wchar_t* str);
+        static std::vector<std::string>& Split(const std::string &s, char delim, std::vector<std::string> &elems);
+        static std::vector<std::string> Split(const std::string &s, char delim);
     private:
         Utility();
         ~Utility();
