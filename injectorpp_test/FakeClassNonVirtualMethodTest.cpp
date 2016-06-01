@@ -1,6 +1,7 @@
 #include "gmock/gmock.h"
 #include "Injector.h"
 #include "Fixtures/Address.h"
+#include <string>
 
 class FakeClassNonVirtualMethodTestFixture : public ::testing::Test
 {
@@ -44,7 +45,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithCCharReturnDefaultV
     EXPECT_EQ(std::string(expected), std::string(actual));
 }
 
-TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithStringReturnDefaultValue)
+/*TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithStringReturnDefaultValue)
 {
     // Prepare
     Address* fakeAddress = INJECTORPP_FAKE<Address>();
@@ -57,7 +58,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithStringReturnDefault
 
     // Assert
     EXPECT_EQ(expected, actual);
-}
+}*/
 
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWhenCalled)
 {
