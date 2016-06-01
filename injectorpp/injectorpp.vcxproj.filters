@@ -48,6 +48,9 @@
     <ClInclude Include="include\SymbolInfoHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Class.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FunctionResolver.cpp">

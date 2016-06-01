@@ -1,22 +1,31 @@
-#ifndef INJECTORPP_FUNCTIONPARAMETER_H
-#define INJECTORPP_FUNCTIONPARAMETER_H
+#ifndef INJECTORPP_FUNCTION_H
+#define INJECTORPP_FUNCTION_H
 
 #include <Windows.h>
 #include <string>
 #include <vector>
 
-struct FunctionParameter
+namespace InjectorPP
 {
-    std::string Name;
-    std::string Type;
-};
+    struct FunctionParameter
+    {
+        std::string Name;
+        std::string Type;
+    };
 
-struct Function
-{
-    std::string Name;
-    std::string ReturnType;
-    std::vector<FunctionParameter> Parameters;
-    ULONG64 Address;
-};
+    struct Function
+    {
+        std::string Name;
+
+        // Without scope or class identifier.
+        // E.G:
+        // Function.Name may be Address::GetMyCode, whereas 
+        // Function.RawName is GetMyCode.
+        std::string RawName;
+        std::string ReturnType;
+        std::vector<FunctionParameter> Parameters;
+        ULONG64 Address;
+    };
+}
 
 #endif

@@ -11,6 +11,7 @@
 #include "IFunctionResolver.h"
 #include "IClassResolver.h"
 #include "SymbolInfoHelper.h"
+#include "Class.h"
 
 namespace InjectorPP
 {
@@ -29,11 +30,9 @@ namespace InjectorPP
     private:
         InjectorCore(const InjectorCore&);
 
-        void AddFunctionSymbolAddressMapping(const std::string& funcSymbol, const ULONG64& address);
+        void GetFunctionAddressByFunctionCallCode(const std::string& funcCallCode, ULONG64& funcAddress);
 
         std::vector<void*> m_allocatedTypeInstances;
-
-        std::map<std::string, ULONG64> m_funcSymAddressMapping;
 
         BehaviorChanger* m_behaviorChanger;
 
@@ -44,6 +43,8 @@ namespace InjectorPP
         SymbolInfoHelper* m_symbolInfoHelper;
 
         HANDLE m_currentProcessHandler;
+
+        std::vector<Class*> m_resolvedClasses;
 
         static bool m_isSymInitialized;
     };

@@ -70,7 +70,7 @@ namespace InjectorPP
     BOOL __stdcall EnumParamsCallback(PSYMBOL_INFO inf, ULONG size, PVOID param)
     {
         // Transform the param back to the one it was before.
-        std::vector<std::string>* params = (std::vector<std::string>*)param;
+        std::vector<FunctionParameter>* params = (std::vector<FunctionParameter>*)param;
         if (inf == NULL)
         {
             return true;
@@ -80,7 +80,19 @@ namespace InjectorPP
         // SYMFLAG_PARAMETER says that its a function parameter.
         if (inf->Flags & SYMFLAG_PARAMETER)
         {
-            params->push_back(inf->Name);
+            FunctionParameter newParam;
+            newParam.Name = inf->Name;
+
+            // TODO: How about complex type and pointers?
+            LPWSTR functionSymName = 0;
+            SymGetTypeInfo(GetCurrentProcess(), inf->ModBase, inf->TypeIndex, TI_GET_SYMNAME, &functionSymName);
+
+            if (functionSymName != NULL)
+            {
+                newParam.Type = Utility::W2M(functionSymName);
+            }
+
+            params->push_back(newParam);
         }
 
         return true;
@@ -116,9 +128,20 @@ namespace InjectorPP
         
         // Get function's parameters.
         std::vector<FunctionParameter> parameters;
-        this->ResolveParameters(modBase, typeIndex, parameters);
+        this->ResolveParameters(functionAddress, modBase, typeIndex, parameters);
 
         resolvedFunction.Name = Utility::W2M(functionSymName);
+
+        size_t scopeIdentifierIndex = resolvedFunction.Name.find("::");
+        if (scopeIdentifierIndex != std::string::npos)
+        {
+            resolvedFunction.RawName = resolvedFunction.Name.substr(scopeIdentifierIndex + 2);
+        }
+        else
+        {
+            resolvedFunction.RawName = resolvedFunction.Name;
+        }
+
         resolvedFunction.Parameters = parameters;
         resolvedFunction.ReturnType = returnType;
         resolvedFunction.Address = functionAddress;
@@ -143,20 +166,19 @@ namespace InjectorPP
         return returnTypeString;
     }
 
-    void FunctionResolver::ResolveParameters(const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters)
+    void FunctionResolver::ResolveParameters(const ULONG64& functionAddress, const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters)
     {
-        // TODO:
+        IMAGEHLP_STACK_FRAME sf;
 
-        /*if (SymGetTypeFromName(hProcess, (ULONG64)module, "?GetCountry@Address@@QAE?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ", sym) == FALSE)
+        sf.InstructionOffset = functionAddress;
+
+        if (!SymSetContext(this->m_hProcess, &sf, 0))
         {
-        std::string err = GetLastErrorStdStr();
-        return p;
-        }*/
+            throw;
+        }
 
-        /*GetLocalVariables(variables, sym->Address);
-
-        BasicType bt = (BasicType)1;
-        SymGetTypeInfo(hProcess, sym->ModBase, sym->TypeIndex, TI_GET_BASETYPE, &bt);*/
+        // Retrieve all parameters of this function.
+        SymEnumSymbols(this->m_hProcess, NULL, NULL, EnumParamsCallback, &resolvedParameters);
     }
 
     void FunctionResolver::LoadBasicType(BasicType bt, ULONG64 byteSize, std::string& resolvedType)
