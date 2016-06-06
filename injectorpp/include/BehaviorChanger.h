@@ -6,6 +6,12 @@
 
 namespace InjectorPP
 {
+    struct OriginalFuncASM
+    {
+        ULONG64 funcAddress;
+        byte asmCode[255];
+    };
+
     class BehaviorChanger
     {
     public:
@@ -16,11 +22,11 @@ namespace InjectorPP
         //
         // funcAddress - The address of the function to be changed from.
         // expectedReturnValue - The return value should be changed to.
-        void ChangeFunctionReturnValue(ULONG64 funcAddress, int expectedReturnValue);
+        void ChangeFunctionReturnValue(ULONG64 funcAddress, const int& expectedReturnValue, OriginalFuncASM& originalFuncAsm);
 
-        void ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue);
+        void ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue, OriginalFuncASM& originalFuncAsm);
 
-        void ChangeFunctionReturnValue(ULONG64 funcAddress, const void* expectedReturnValue);
+        void ChangeFunctionReturnValue(ULONG64 funcAddress, const void* expectedReturnValue, OriginalFuncASM& originalFuncAsm);
     private:
         BehaviorChanger(const BehaviorChanger&);
 

@@ -30,6 +30,19 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithIntReturnDefaultVal
     EXPECT_EQ(expected, actual);
 }
 
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithIntNotReturnDefaultValue)
+{
+    // Prepare
+    Address* fakeAddress = INJECTORPP_FAKE<Address>(false);
+    int expected = -1;
+
+    // Act
+    int actual = fakeAddress->GetZipCode();
+
+    // Assert
+    EXPECT_EQ(expected, actual);
+}
+
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithCCharReturnDefaultValue)
 {
     // Prepare

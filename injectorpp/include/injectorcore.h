@@ -22,7 +22,7 @@ namespace InjectorPP
 
         ~InjectorCore();
 
-        void* Fake(const char* typeName, size_t typeSize);
+        void* Fake(const char* typeName, size_t typeSize, bool autoFillDefaultValue);
 
         void ChangeFunctionReturnValue(const std::string& funcCallCode, const int& expectedReturnValue);
 

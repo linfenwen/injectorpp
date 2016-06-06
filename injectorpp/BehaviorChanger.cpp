@@ -27,7 +27,7 @@ namespace InjectorPP
     //
     // funcAddress - The address of the function to be changed from.
     // expectedReturnValue - The return value should be changed to.
-    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, int expectedReturnValue)
+    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const int& expectedReturnValue, OriginalFuncASM& originalFuncAsm)
     {
         // The purpose of this method is to change the return value
         // to what ever int value we expected.
@@ -57,7 +57,7 @@ namespace InjectorPP
         WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCommand, 6, 0);
     }
 
-    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const void* expectedReturnValue)
+    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const void* expectedReturnValue, OriginalFuncASM& originalFuncAsm)
     {
         if (expectedReturnValue == NULL)
         {
@@ -156,7 +156,7 @@ namespace InjectorPP
         //WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCommand, 6, 0);
     //}
 
-    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue)
+    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue, OriginalFuncASM& originalFuncAsm)
     {
         // Allocate a new buff to store the expected return value.
         char* newCharBuff = new char[MAX_CHAR_BUFF_SIZE];
