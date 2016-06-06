@@ -2,7 +2,6 @@
 #include <vector>
 #include "ClassResolver.h"
 #include "FunctionResolver.h"
-#include "FakeFunctions.h"
 #include "Utility.h"
 
 namespace InjectorPP
@@ -72,7 +71,7 @@ namespace InjectorPP
         }
     }
 
-    void* InjectorCore::Fake(const char* typeName, size_t typeSize)
+    void* InjectorCore::Fake(const char* typeName, size_t typeSize, bool autoFillDefaultValue)
     {
         if (!InjectorCore::m_isSymInitialized)
         {
@@ -109,21 +108,22 @@ namespace InjectorPP
             // Store the new class.
             this->m_resolvedClasses.push_back(cls);
 
-            std::vector<Function>::iterator resolvedMethodIterator = cls->Methods.begin();
-            for (; resolvedMethodIterator != cls->Methods.end(); ++resolvedMethodIterator)
+            if (autoFillDefaultValue)
             {
-                if ((*resolvedMethodIterator).ReturnType == "std::basic_string<char,std::char_traits<char>,std::allocator<char> >")
+                std::vector<Function>::iterator resolvedMethodIterator = cls->Methods.begin();
+                for (; resolvedMethodIterator != cls->Methods.end(); ++resolvedMethodIterator)
                 {
-                    // TODO: std::string won't work here.
-                    this->m_behaviorChanger->ChangeFunctionReturnValue((*resolvedMethodIterator).Address, "");
-                }
-                else if ((*resolvedMethodIterator).ReturnType == "signed __int32")
-                {
-                    this->m_behaviorChanger->ChangeFunctionReturnValue((*resolvedMethodIterator).Address, 0);
-                }
-                else if ((*resolvedMethodIterator).ReturnType == "char*")
-                {
-                    this->m_behaviorChanger->ChangeFunctionReturnValue((*resolvedMethodIterator).Address, "");
+                    // TODO: Save the original asm code. Revert the function behavior when uninitialize.
+                    OriginalFuncASM originalFuncAsm;
+
+                    if ((*resolvedMethodIterator).ReturnType == "signed __int32")
+                    {
+                        this->m_behaviorChanger->ChangeFunctionReturnValue((*resolvedMethodIterator).Address, 0, originalFuncAsm);
+                    }
+                    else if ((*resolvedMethodIterator).ReturnType == "char*")
+                    {
+                        this->m_behaviorChanger->ChangeFunctionReturnValue((*resolvedMethodIterator).Address, "", originalFuncAsm);
+                    }
                 }
             }
         }
@@ -147,7 +147,21 @@ namespace InjectorPP
         ULONG64 funcAddress = 0;
         this->GetFunctionAddressByFunctionCallCode(funcCallCode, funcAddress);
 
-        this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue);
+        // TODO: Save the original asm code. Revert the function behavior when uninitialize.
+        OriginalFuncASM originalFuncAsm;
+
+        this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue, originalFuncAsm);
+    }
+
+    void InjectorCore::ChangeFunctionReturnValue(const std::string& funcCallCode, const void* expectedReturnValue)
+    {
+        ULONG64 funcAddress = 0;
+        this->GetFunctionAddressByFunctionCallCode(funcCallCode, funcAddress);
+
+        // TODO: Save the original asm code. Revert the function behavior when uninitialize.
+        OriginalFuncASM originalFuncAsm;
+
+        this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue, originalFuncAsm);
     }
 
     void InjectorCore::ChangeFunctionReturnValue(const std::string& funcCallCode, const char* expectedReturnValue)
@@ -155,7 +169,10 @@ namespace InjectorPP
         ULONG64 funcAddress = 0;
         this->GetFunctionAddressByFunctionCallCode(funcCallCode, funcAddress);
 
-        this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue);
+        // TODO: Save the original asm code. Revert the function behavior when uninitialize.
+        OriginalFuncASM originalFuncAsm;
+
+        this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue, originalFuncAsm);
     }
 
     void InjectorCore::GetFunctionAddressByFunctionCallCode(const std::string& funcCallCode, ULONG64& funcAddress)

@@ -13,7 +13,7 @@ private:
 public:
     static Address* GetSingleton();
     static void ClearSingleton();
-    static string GetCapitalCityByCountry(string country);
+    static string* GetCapitalCityByCountry(string country);
 
     Address() {};
     int GetMyCode();

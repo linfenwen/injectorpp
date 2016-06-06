@@ -50,9 +50,9 @@ namespace InjectorPP
         }
 
         template <typename T>
-        T* Fake()
+        T* Fake(bool autoFillDefaultValue = true)
         {
-            return static_cast<T*>(this->m_injectorCore->Fake(typeid(T).name(), sizeof(T)));
+            return static_cast<T*>(this->m_injectorCore->Fake(typeid(T).name(), sizeof(T), autoFillDefaultValue));
         }
 
         void PushWhenCalledFunction(const std::string& funcCallCode)
@@ -74,6 +74,19 @@ namespace InjectorPP
         }
 
         void Return(char* expectedReturnValue)
+        {
+            if (this->m_whenCalledFuncCode.empty())
+            {
+                throw;
+            }
+
+            std::string funcCallCode = this->m_whenCalledFuncCode.top();
+            this->m_whenCalledFuncCode.pop();
+
+            this->m_injectorCore->ChangeFunctionReturnValue(funcCallCode, expectedReturnValue);
+        }
+
+        void Return(void* expectedReturnValue)
         {
             if (this->m_whenCalledFuncCode.empty())
             {
