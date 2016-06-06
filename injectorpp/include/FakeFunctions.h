@@ -6,6 +6,8 @@
 
 int fakeReturnIntFuncReturnValue = 0;
 
+std::string* t = new std::string("a");
+
 int FakeReturnIntFunc()
 {
     return 2;
@@ -25,6 +27,18 @@ char* FakeReturnCCharFunc()
 std::string FakeReturnStringFunc()
 {
     return "";
+    /*__asm 
+    {
+        push ""
+        move ecx, [ebp+8]
+        call string::basic_string
+    }*/
+}
+
+void* FakeReturnPointerFunc(void* d)
+{
+    std::string* ss = new std::string();
+    return t;
 }
 
 #endif

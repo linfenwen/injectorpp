@@ -36,7 +36,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithCCharReturnDefaultV
     Address* fakeAddress = INJECTORPP_FAKE<Address>();
     char* expected = "aa";
 
-    WHEN_CALLED(fakeAddress->GetCity()).Return("aa");
+    WHEN_CALLED(fakeAddress->GetCity()).Return(expected);
 
     // Act
     char* actual = fakeAddress->GetCity();
@@ -45,20 +45,22 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithCCharReturnDefaultV
     EXPECT_EQ(std::string(expected), std::string(actual));
 }
 
-/*TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithStringReturnDefaultValue)
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithStringReturnDefaultValue)
 {
+    extern void* FakeReturnPointerFunc(void*);
+
     // Prepare
     Address* fakeAddress = INJECTORPP_FAKE<Address>();
-    std::string expected = "";
+    std::string expected("expectedString");
 
-    WHEN_CALLED(fakeAddress->GetCapitalCityByCountry("")).Return("bb");
+    WHEN_CALLED(fakeAddress->GetCapitalCityByCountry("")).Return(&expected);
 
     // Act
-    std::string actual = fakeAddress->GetCapitalCityByCountry("bb");
+    std::string* actual = fakeAddress->GetCapitalCityByCountry("");
 
     // Assert
-    EXPECT_EQ(expected, actual);
-}*/
+    EXPECT_EQ(expected, *actual);
+}
 
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWhenCalled)
 {

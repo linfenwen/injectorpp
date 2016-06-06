@@ -27,6 +27,10 @@ namespace InjectorPP
         void ChangeFunctionReturnValue(const std::string& funcCallCode, const int& expectedReturnValue);
 
         void ChangeFunctionReturnValue(const std::string& funcCallCode, const char* expectedReturnValue);
+
+        void ChangeFunctionReturnValue(const std::string& funcCallCode, const void* expectedReturnValue);
+
+        //void ChangeFunctionReturnValue(const std::string& funcCallCode, const std::string& expectedReturnValue);
     private:
         InjectorCore(const InjectorCore&);
 

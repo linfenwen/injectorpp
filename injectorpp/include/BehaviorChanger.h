@@ -19,6 +19,8 @@ namespace InjectorPP
         void ChangeFunctionReturnValue(ULONG64 funcAddress, int expectedReturnValue);
 
         void ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue);
+
+        void ChangeFunctionReturnValue(ULONG64 funcAddress, const void* expectedReturnValue);
     private:
         BehaviorChanger(const BehaviorChanger&);
 

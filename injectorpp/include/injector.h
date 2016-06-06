@@ -85,6 +85,19 @@ namespace InjectorPP
 
             this->m_injectorCore->ChangeFunctionReturnValue(funcCallCode, expectedReturnValue);
         }
+
+        void Return(void* expectedReturnValue)
+        {
+            if (this->m_whenCalledFuncCode.empty())
+            {
+                throw;
+            }
+
+            std::string funcCallCode = this->m_whenCalledFuncCode.top();
+            this->m_whenCalledFuncCode.pop();
+
+            this->m_injectorCore->ChangeFunctionReturnValue(funcCallCode, expectedReturnValue);
+        }
     private:
         Injector()
         {
