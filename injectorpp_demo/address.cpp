@@ -49,7 +49,7 @@ void Address::ClearSingleton()
     }
 }
 
-string Address::GetCapitalCityByCountry(string country)
+string* Address::GetCapitalCityByCountry(string country)
 {
     throw;
 }

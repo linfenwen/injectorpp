@@ -26,6 +26,9 @@ TEST_F(AddressTestFixture, MyTest)
     // Will return "" instead of the real implementation!
     std::cout << fakeAddress->GetCity() << std::endl;
 
-    // Will return "" instead of the real implementation!
-    std::cout << fakeAddress->GetCapitalCityByCountry("") << std::endl;
+    std::string fakeCountry("fake country");
+    WHEN_CALLED(fakeAddress->GetCapitalCityByCountry("")).Return(&fakeCountry);
+
+    // Will return "fake country" instead of the real implementation!
+    std::cout << *fakeAddress->GetCapitalCityByCountry("") << std::endl;
 }

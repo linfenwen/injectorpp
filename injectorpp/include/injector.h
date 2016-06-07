@@ -24,7 +24,7 @@ namespace InjectorPP
         // This method is non-thread safe.
         static Injector* GetInstance()
         {
-            if (m_instance == 0)
+            if (m_instance == NULL)
             {
                 m_instance = new Injector();
             }
@@ -100,6 +100,7 @@ namespace InjectorPP
         }
     private:
         Injector()
+            :m_injectorCore(NULL)
         {
             if (this->m_injectorCore == NULL)
             {

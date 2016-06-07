@@ -100,7 +100,7 @@ namespace InjectorPP
             InjectorCore::m_isSymInitialized = true;
         }
 
-        void* typeInstance = nullptr;
+        void* typeInstance = NULL;
 
         // Allocate a symbol entity to store top level symbol info.
         PSYMBOL_INFO sym = this->m_symbolInfoHelper->AllocSymbol();

@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="gb2312"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="gmock"
-	ProjectGUID="{34681F0D-CE45-415D-B5F2-5C662DFE3BD5}"
-	RootNamespace="gmock"
-	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
+	Name="injectorpp_demo"
+	ProjectGUID="{C488C03E-C97A-4508-87A2-44ABD3487793}"
+	RootNamespace="injectorpp_demo"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -19,9 +18,8 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)\$(ProjectName)"
-			ConfigurationType="4"
-			InheritedPropertySheets=".\gmock_config.vsprops"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -42,15 +40,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;..\.."
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				AdditionalIncludeDirectories="$(ProjectDir)..\..\..\injectorpp\include;$(ProjectDir)..\..\..\gtest\googlemock\include;$(ProjectDir)..\..\..\gtest\googletest\include"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				DebugInformationFormat="4"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,10 +57,16 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
+				AdditionalDependencies="dbghelp.lib $(ProjectDir)..\injectorpp\Debug\injectorpp.lib $(ProjectDir)..\injectorpp\Debug\gmock.lib"
+				GenerateDebugInformation="true"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -77,16 +78,18 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(OutDir)\$(ProjectName)"
-			ConfigurationType="4"
-			InheritedPropertySheets=".\gmock_config.vsprops"
-			CharacterSet="1"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -106,12 +109,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\.."
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				RuntimeLibrary="0"
-				UsePrecompiledHeader="0"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -124,10 +126,17 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
+				GenerateDebugInformation="true"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -139,6 +148,9 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -147,44 +159,40 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
+			Name="Ô´ÎÄ¼þ"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\gmock-all.cc"
+				RelativePath="..\..\..\injectorpp_demo\Address.cpp"
 				>
 			</File>
 			<File
-				RelativePath="$(GTestDir)\src\gtest-all.cc"
+				RelativePath="..\..\..\injectorpp_demo\AddressTest.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="$(GTestDir)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="$(GTestDir)"
-					/>
-				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\injectorpp_demo\Main.cpp"
+				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Public Header Files"
+			Name="Í·ÎÄ¼þ"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\..\injectorpp_demo\Address.h"
+				>
+			</File>
 		</Filter>
 		<Filter
-			Name="Private Header Files"
+			Name="×ÊÔ´ÎÄ¼þ"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
 	</Files>
+	<Globals>
+	</Globals>
 </VisualStudioProject>
