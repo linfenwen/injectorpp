@@ -27,8 +27,12 @@ namespace InjectorPP
     //
     // funcAddress - The address of the function to be changed from.
     // expectedReturnValue - The return value should be changed to.
-    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const int& expectedReturnValue, OriginalFuncASM& originalFuncAsm)
+    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const int& expectedReturnValue, OriginalFuncASM* originalFuncAsm)
     {
+        // First important thing, backup the original asm code.
+        originalFuncAsm->funcAddress = funcAddress;
+        ReadProcessMemory((HANDLE)-1, (void*)originalFuncAsm->funcAddress, originalFuncAsm->asmCode, 6, 0);
+
         // The purpose of this method is to change the return value
         // to what ever int value we expected.
 
@@ -54,11 +58,15 @@ namespace InjectorPP
         // ret
         asmCommand[5] = 0xC3;
 
-        WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCommand, 6, 0);
+        this->DirectWriteToFunction(funcAddress, asmCommand, 6);
     }
 
-    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const void* expectedReturnValue, OriginalFuncASM& originalFuncAsm)
+    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const void* expectedReturnValue, OriginalFuncASM* originalFuncAsm)
     {
+        // First important thing, backup the original asm code.
+        originalFuncAsm->funcAddress = funcAddress;
+        ReadProcessMemory((HANDLE)-1, (void*)originalFuncAsm->funcAddress, originalFuncAsm->asmCode, 6, 0);
+
         if (expectedReturnValue == NULL)
         {
             return;
@@ -80,7 +88,7 @@ namespace InjectorPP
         // ret
         asmCommand[5] = 0xC3;
 
-        WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCommand, 6, 0);
+        this->DirectWriteToFunction(funcAddress, asmCommand, 6);
     }
 
     //void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, std::string expectedReturnValue)
@@ -156,8 +164,12 @@ namespace InjectorPP
         //WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCommand, 6, 0);
     //}
 
-    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue, OriginalFuncASM& originalFuncAsm)
+    void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue, OriginalFuncASM* originalFuncAsm)
     {
+        // First important thing, backup the original asm code.
+        originalFuncAsm->funcAddress = funcAddress;
+        ReadProcessMemory((HANDLE)-1, (void*)originalFuncAsm->funcAddress, originalFuncAsm->asmCode, 6, 0);
+
         // Allocate a new buff to store the expected return value.
         char* newCharBuff = new char[MAX_CHAR_BUFF_SIZE];
         strcpy_s(newCharBuff, MAX_CHAR_BUFF_SIZE, expectedReturnValue);
@@ -221,6 +233,11 @@ namespace InjectorPP
         // ret
         asmCommand[5] = 0xC3;
 
-        WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCommand, 6, 0);
+        this->DirectWriteToFunction(funcAddress, asmCommand, 6);
+    }
+
+    void BehaviorChanger::DirectWriteToFunction(ULONG64 funcAddress, const byte* asmCode, size_t asmCodeSize)
+    {
+        WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCode, asmCodeSize, 0);
     }
 }

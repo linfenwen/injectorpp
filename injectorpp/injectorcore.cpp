@@ -1,5 +1,7 @@
-#include "InjectorCore.h"
 #include <vector>
+#include <algorithm>
+
+#include "InjectorCore.h"
 #include "ClassResolver.h"
 #include "FunctionResolver.h"
 #include "Utility.h"
@@ -43,6 +45,20 @@ namespace InjectorPP
             {
                 delete *classIt;
                 *classIt = NULL;
+            }
+        }
+
+        // Release all original function asms.
+        std::vector<OriginalFuncASM*>::iterator ofaIt;
+        for (ofaIt = this->m_originalFunctionASMVector.begin(); ofaIt != this->m_originalFunctionASMVector.end(); ++ofaIt)
+        {
+            if (*ofaIt != NULL)
+            {
+                // Recover the original function behavior.
+                this->m_behaviorChanger->DirectWriteToFunction((*ofaIt)->funcAddress, (*ofaIt)->asmCode, 6);
+
+                delete *ofaIt;
+                *ofaIt = NULL;
             }
         }
 
@@ -113,8 +129,8 @@ namespace InjectorPP
                 std::vector<Function>::iterator resolvedMethodIterator = cls->Methods.begin();
                 for (; resolvedMethodIterator != cls->Methods.end(); ++resolvedMethodIterator)
                 {
-                    // TODO: Save the original asm code. Revert the function behavior when uninitialize.
-                    OriginalFuncASM originalFuncAsm;
+                    // Save the original asm code. Revert the function behavior when uninitialize.
+                    OriginalFuncASM* originalFuncAsm = new OriginalFuncASM();
 
                     if ((*resolvedMethodIterator).ReturnType == "signed __int32")
                     {
@@ -123,6 +139,12 @@ namespace InjectorPP
                     else if ((*resolvedMethodIterator).ReturnType == "char*")
                     {
                         this->m_behaviorChanger->ChangeFunctionReturnValue((*resolvedMethodIterator).Address, "", originalFuncAsm);
+                    }
+
+                    if (!this->SaveOriginalFuncASM(originalFuncAsm))
+                    {
+                        delete originalFuncAsm;
+                        originalFuncAsm = NULL;
                     }
                 }
             }
@@ -147,10 +169,38 @@ namespace InjectorPP
         ULONG64 funcAddress = 0;
         this->GetFunctionAddressByFunctionCallCode(funcCallCode, funcAddress);
 
-        // TODO: Save the original asm code. Revert the function behavior when uninitialize.
-        OriginalFuncASM originalFuncAsm;
+        // Save the original asm code. Revert the function behavior when uninitialize.
+        OriginalFuncASM* originalFuncAsm = new OriginalFuncASM();
 
         this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue, originalFuncAsm);
+
+        if (!this->SaveOriginalFuncASM(originalFuncAsm))
+        {
+            delete originalFuncAsm;
+            originalFuncAsm = NULL;
+        }
+    }
+
+    bool InjectorCore::SaveOriginalFuncASM(OriginalFuncASM* originalFuncASM)
+    {
+        if (originalFuncASM->funcAddress == 0)
+        {
+            return false;
+        }
+
+        std::vector<OriginalFuncASM*>::iterator it = this->m_originalFunctionASMVector.begin();
+        for (; it != this->m_originalFunctionASMVector.end(); ++it)
+        {
+            if ((*it)->funcAddress == originalFuncASM->funcAddress)
+            {
+                // The original asm already been stored.
+                return false;
+            }
+        }
+
+        this->m_originalFunctionASMVector.push_back(originalFuncASM);
+
+        return true;
     }
 
     void InjectorCore::ChangeFunctionReturnValue(const std::string& funcCallCode, const void* expectedReturnValue)
@@ -158,10 +208,16 @@ namespace InjectorPP
         ULONG64 funcAddress = 0;
         this->GetFunctionAddressByFunctionCallCode(funcCallCode, funcAddress);
 
-        // TODO: Save the original asm code. Revert the function behavior when uninitialize.
-        OriginalFuncASM originalFuncAsm;
+        // Save the original asm code. Revert the function behavior when uninitialize.
+        OriginalFuncASM* originalFuncAsm = new OriginalFuncASM();
 
         this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue, originalFuncAsm);
+
+        if (!this->SaveOriginalFuncASM(originalFuncAsm))
+        {
+            delete originalFuncAsm;
+            originalFuncAsm = NULL;
+        }
     }
 
     void InjectorCore::ChangeFunctionReturnValue(const std::string& funcCallCode, const char* expectedReturnValue)
@@ -169,10 +225,16 @@ namespace InjectorPP
         ULONG64 funcAddress = 0;
         this->GetFunctionAddressByFunctionCallCode(funcCallCode, funcAddress);
 
-        // TODO: Save the original asm code. Revert the function behavior when uninitialize.
-        OriginalFuncASM originalFuncAsm;
+        // Save the original asm code. Revert the function behavior when uninitialize.
+        OriginalFuncASM* originalFuncAsm = new OriginalFuncASM();
 
         this->m_behaviorChanger->ChangeFunctionReturnValue(funcAddress, expectedReturnValue, originalFuncAsm);
+
+        if (!this->SaveOriginalFuncASM(originalFuncAsm))
+        {
+            delete originalFuncAsm;
+            originalFuncAsm = NULL;
+        }
     }
 
     void InjectorCore::GetFunctionAddressByFunctionCallCode(const std::string& funcCallCode, ULONG64& funcAddress)

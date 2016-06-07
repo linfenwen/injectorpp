@@ -60,8 +60,6 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithCCharReturnDefaultV
 
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithStringReturnDefaultValue)
 {
-    extern void* FakeReturnPointerFunc(void*);
-
     // Prepare
     Address* fakeAddress = INJECTORPP_FAKE<Address>();
     std::string expected("expectedString");
