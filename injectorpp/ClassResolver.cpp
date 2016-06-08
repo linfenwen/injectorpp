@@ -59,6 +59,18 @@ namespace InjectorPP
         {
             ULONG curChild = methods->ChildId[i];
 
+            DWORD tag = 0;
+            if (SymGetTypeInfo(this->m_hProcess, classSymbol->ModBase, curChild, TI_GET_SYMTAG, &tag) == FALSE)
+            {
+                throw;
+            }
+
+            if (tag != SymTagFunction)
+            {
+                // We do not process member varaibles.
+                continue;
+            }
+
             // Resolve function.
             Function resolvedFunction;
             this->m_functionResolver->Resolve(classSymbol->ModBase, curChild, resolvedFunction);
