@@ -30,11 +30,12 @@ namespace InjectorPP
 
         void ChangeFunctionReturnValue(const std::string& funcCallCode, const void* expectedReturnValue);
 
-        //void ChangeFunctionReturnValue(const std::string& funcCallCode, const std::string& expectedReturnValue);
     private:
         InjectorCore(const InjectorCore&);
 
         void GetFunctionAddressByFunctionCallCode(const std::string& funcCallCode, ULONG64& funcAddress);
+
+        bool SaveOriginalFuncASM(OriginalFuncASM* originalFuncASM);
 
         std::vector<void*> m_allocatedTypeInstances;
 
@@ -49,6 +50,8 @@ namespace InjectorPP
         HANDLE m_currentProcessHandler;
 
         std::vector<Class*> m_resolvedClasses;
+
+        std::vector<OriginalFuncASM*> m_originalFunctionASMVector;
 
         static bool m_isSymInitialized;
     };
