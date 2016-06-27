@@ -1,6 +1,8 @@
 #ifndef INJECTORPP_SYMBOLINFOHELPER_H
 #define INJECTORPP_SYMBOLINFOHELPER_H
 
+#define _NO_CVCONST_H
+
 #include <Windows.h>
 #include <DbgHelp.h>
 #include <vector>

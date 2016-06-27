@@ -30,6 +30,9 @@ public:
 
     static char *GetZipCode(char *country, char *streetName);
 private:
+    char* dumyCharArrayField;
+    int dummyIntField;
+
     void SetCountryInternal(std::string country);
     static void CountReference();
     void OverloadedPrivate(int i);

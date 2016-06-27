@@ -113,14 +113,16 @@ namespace InjectorPP
         ULONG64 functionAddress = 0;
         if (SymGetTypeInfo(this->m_hProcess, modBase, typeIndex, TI_GET_ADDRESS, &functionAddress) == FALSE)
         {
-            throw;
+            // Failed to get function address.
+            return;
         }
 
         // Get function's symbol name.
         LPWSTR functionSymName;
         if (SymGetTypeInfo(this->m_hProcess, modBase, typeIndex, TI_GET_SYMNAME, &functionSymName) == FALSE)
         {
-            throw;
+            // Failed to get symbol name;
+            return;
         }
 
         // Get function's return type.
