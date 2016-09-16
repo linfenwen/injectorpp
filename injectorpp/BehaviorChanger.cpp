@@ -45,7 +45,7 @@ namespace InjectorPP
 
         // Now let's prepare the asm command.
         byte asmCommand[6];
-        
+
         // mov
         asmCommand[0] = 0xB8;
 
@@ -164,6 +164,35 @@ namespace InjectorPP
         //WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCommand, 6, 0);
     //}
 
+    void BehaviorChanger::ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm)
+    {
+        // First important thing, backup the original asm code.
+        originalFuncAsm->funcAddress = sourceFuncAddress;
+        ReadProcessMemory((HANDLE)-1, (void*)originalFuncAsm->funcAddress, originalFuncAsm->asmCode, 6, 0);
+
+        // Calculate the offset.
+        // We will inject 'E8 <offset>' to the begining of the source function.
+        // E8 opcode requires 5 bytes (1 byte for opcode, 4 bytes for address) 
+        // so the next instruction's address is the source function address + 5.
+        // The <offset> value is targetFuncAddress - <next instruction's address>.
+        ULONG64 offset = targetFuncAddress - (sourceFuncAddress + 5);
+
+        byte asmCommand[6];
+
+        // call
+        asmCommand[0] = 0xE8;
+
+        asmCommand[1] = (offset) & 0xFF;
+        asmCommand[2] = (offset >> 8) & 0xFF;
+        asmCommand[3] = (offset >> 16) & 0xFF;
+        asmCommand[4] = (offset >> 24) & 0xFF;
+
+        // ret
+        asmCommand[5] = 0xC3;
+
+        this->DirectWriteToFunction(sourceFuncAddress, asmCommand, 6);
+    }
+
     void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue, OriginalFuncASM* originalFuncAsm)
     {
         // First important thing, backup the original asm code.
@@ -173,7 +202,7 @@ namespace InjectorPP
         // Allocate a new buff to store the expected return value.
         char* newCharBuff = new char[MAX_CHAR_BUFF_SIZE];
         strcpy_s(newCharBuff, MAX_CHAR_BUFF_SIZE, expectedReturnValue);
-        
+
         // Store the new buff to a vector so that it can be released in the de-constructor.
         this->m_allocatedCharBuff.push_back(newCharBuff);
 
@@ -221,7 +250,7 @@ namespace InjectorPP
         byte asmCommand[6];
 
         // mov
-        asmCommand[0] = 0xA1;
+        asmCommand[0] = 0xE8;
 
         // OK, we need to retreive the address of latest element, which holds the
         // address of newCharBuff.

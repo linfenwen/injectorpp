@@ -68,7 +68,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -116,12 +118,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Fixtures\Address.cpp" />
     <ClCompile Include="FakeClassNonVirtualMethodTest.cpp" />
+    <ClCompile Include="FakeClassVirtualMethodTest.cpp" />
+    <ClCompile Include="Fixtures\Address.cpp" />
+    <ClCompile Include="Fixtures\BaseClassTest.cpp" />
+    <ClCompile Include="Fixtures\SubClassTest.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Fixtures\Address.h" />
+    <ClInclude Include="Fixtures\BaseClassTest.h" />
+    <ClInclude Include="Fixtures\SubClassTest.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

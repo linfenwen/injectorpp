@@ -48,19 +48,8 @@ namespace InjectorPP
             }
         }
 
-        // Release all original function asms.
-        std::vector<OriginalFuncASM*>::iterator ofaIt;
-        for (ofaIt = this->m_originalFunctionASMVector.begin(); ofaIt != this->m_originalFunctionASMVector.end(); ++ofaIt)
-        {
-            if (*ofaIt != NULL)
-            {
-                // Recover the original function behavior.
-                this->m_behaviorChanger->DirectWriteToFunction((*ofaIt)->funcAddress, (*ofaIt)->asmCode, 6);
-
-                delete *ofaIt;
-                *ofaIt = NULL;
-            }
-        }
+        // Release all original function asms and recover the replaced functions.
+        this->RecoverAllReplacedFunctions();
 
         if (this->m_symbolInfoHelper != NULL)
         {
@@ -87,6 +76,90 @@ namespace InjectorPP
         }
     }
 
+    void InjectorCore::Initialize()
+    {
+        if (!InjectorCore::m_isSymInitialized)
+        {
+            // Let's initialize the whole symbol system.
+            if (SymInitialize(this->m_currentProcessHandler, NULL, TRUE) == FALSE)
+            {
+                throw;
+            }
+
+            InjectorCore::m_isSymInitialized = true;
+        }
+    }
+
+    void* InjectorCore::GetVirtualMethodAddress(void* classInstance, const std::string& virtualMethodName)
+    {
+        void* result = NULL;
+
+        // The method name stored in pdb may be decorated. We should decorate our
+        // virtual method name either.
+        std::string decoratedMethodName = "?" + virtualMethodName + "@";
+
+        ULONG64* vptrForClass = *(ULONG64**)*(ULONG64**)&classInstance;
+        ULONG64** virtualMethodAddress = (ULONG64**)vptrForClass;
+        while (*virtualMethodAddress != NULL)
+        {
+            ULONG64 address = (ULONG64)*virtualMethodAddress;
+            std::string funcSymName = this->m_functionResolver->GetMethodSymbolFromAddress(address);
+
+            // Is this function symbol name contains the virtual method name?
+            if (funcSymName.find(decoratedMethodName) != std::string::npos
+                || funcSymName.find("::" + virtualMethodName) != std::string::npos)
+            {
+                // Yes! We found the virtual method address!
+                result = *virtualMethodAddress;
+
+                break;
+            }
+
+            virtualMethodAddress += 1;
+        }
+
+        if (result == NULL)
+        {
+            throw;
+        }
+
+        return result;
+    }
+
+    void InjectorCore::ReplaceFunction(void* srcFunc, void* destFunc)
+    {
+        // Save the original asm code. 
+        // Useful when we recover the function behavior.
+        OriginalFuncASM* originalFuncAsm = new OriginalFuncASM();
+
+        this->m_behaviorChanger->ReplaceFunction((ULONG64)srcFunc, (ULONG64)destFunc, originalFuncAsm);
+
+        if (!this->SaveOriginalFuncASM(originalFuncAsm))
+        {
+            delete originalFuncAsm;
+            originalFuncAsm = NULL;
+        }
+    }
+
+    void InjectorCore::RecoverAllReplacedFunctions()
+    {
+        // Release all original function asms.
+        std::vector<OriginalFuncASM*>::iterator ofaIt;
+        for (ofaIt = this->m_originalFunctionASMVector.begin(); ofaIt != this->m_originalFunctionASMVector.end(); ++ofaIt)
+        {
+            if (*ofaIt != NULL)
+            {
+                // Recover the original function behavior.
+                this->m_behaviorChanger->DirectWriteToFunction((*ofaIt)->funcAddress, (*ofaIt)->asmCode, 6);
+
+                delete *ofaIt;
+                *ofaIt = NULL;
+            }
+        }
+
+        this->m_originalFunctionASMVector.clear();
+    }
+
     void* InjectorCore::Fake(const char* typeName, size_t typeSize, bool autoFillDefaultValue)
     {
         if (!InjectorCore::m_isSymInitialized)
@@ -109,7 +182,7 @@ namespace InjectorPP
         HMODULE module = GetModuleHandle(0);
 
         std::string typeNameString(typeName);
-        
+
         std::string classSpecifier("class ");
         std::string startStr = typeNameString.substr(0, classSpecifier.length());
         if (startStr == classSpecifier)
@@ -245,7 +318,7 @@ namespace InjectorPP
 
         size_t leftBrackeIndex = functionSignature.find("(");
         size_t paramterStringCount = functionSignature.find(")") - leftBrackeIndex - 1;
-        
+
         size_t parameterCount = 0;
         if (paramterStringCount != 0)
         {

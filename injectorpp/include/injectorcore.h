@@ -20,7 +20,13 @@ namespace InjectorPP
     public:
         InjectorCore();
 
-        ~InjectorCore();
+        virtual ~InjectorCore();
+
+        void Initialize();
+
+        void* GetVirtualMethodAddress(void* classInstance, const std::string& virtualMethodName);
+
+        void ReplaceFunction(void* srcFunc, void* destFunc);
 
         void* Fake(const char* typeName, size_t typeSize, bool autoFillDefaultValue);
 
@@ -32,6 +38,8 @@ namespace InjectorPP
 
     private:
         InjectorCore(const InjectorCore&);
+
+        void RecoverAllReplacedFunctions();
 
         void GetFunctionAddressByFunctionCallCode(const std::string& funcCallCode, ULONG64& funcAddress);
 

@@ -11,7 +11,14 @@ namespace InjectorPP
     class Injector
     {
     public:
-        ~Injector()
+        Injector()
+            :m_injectorCore(NULL)
+        {
+            this->m_injectorCore = new InjectorCore();
+            this->m_injectorCore->Initialize();
+        }
+
+        virtual ~Injector()
         {
             if (this->m_injectorCore != NULL)
             {
@@ -20,33 +27,38 @@ namespace InjectorPP
             }
         }
 
-        // Get the single instance of Injector.
-        // This method is non-thread safe.
-        static Injector* GetInstance()
+        Injector& WhenCalled(void* srcMockFunc)
         {
-            if (m_instance == NULL)
-            {
-                m_instance = new Injector();
-            }
-
-            return m_instance;
+            this->m_whenCalledFunc.push(srcMockFunc);
+            return *this;
         }
 
-        static void Initialize()
+        Injector& WhenCalledVirtualMethod(void* classInstance, const std::string& virtualMethodName)
         {
-            if (m_instance == NULL)
-            {
-                m_instance = new Injector();
-            }
+            void* virtualFunction = this->m_injectorCore->GetVirtualMethodAddress(classInstance, virtualMethodName);
+            this->m_whenCalledFunc.push(virtualFunction);
+
+            return *this;
         }
 
-        static void Uninitialize()
+        Injector& WillExecute(void* destMockFunc)
         {
-            if (m_instance != NULL)
+            if (this->m_whenCalledFunc.empty())
             {
-                delete m_instance;
-                m_instance = NULL;
+                throw;
             }
+
+            if (this->m_whenCalledFunc.size() > 1)
+            {
+                throw;
+            }
+
+            void* srcMockFunc = this->m_whenCalledFunc.top();
+            this->m_whenCalledFunc.pop();
+
+            this->m_injectorCore->ReplaceFunction(srcMockFunc, destMockFunc);
+
+            return *this;
         }
 
         template <typename T>
@@ -55,12 +67,7 @@ namespace InjectorPP
             return static_cast<T*>(this->m_injectorCore->Fake(typeid(T).name(), sizeof(T), autoFillDefaultValue));
         }
 
-        void PushWhenCalledFunction(const std::string& funcCallCode)
-        {
-            this->m_whenCalledFuncCode.push(funcCallCode);
-        }
-        
-        void Return(int expectedReturnValue)
+        /*void Return(int expectedReturnValue)
         {
             if (this->m_whenCalledFuncCode.empty())
             {
@@ -97,43 +104,33 @@ namespace InjectorPP
             this->m_whenCalledFuncCode.pop();
 
             this->m_injectorCore->ChangeFunctionReturnValue(funcCallCode, expectedReturnValue);
-        }
-    private:
-        Injector()
-            :m_injectorCore(NULL)
+        }*/
+
+        template<typename outtype, typename intype>
+        static outtype ForceCast(intype in)
         {
-            if (this->m_injectorCore == NULL)
+            union
             {
-                this->m_injectorCore = new InjectorCore();
+                intype  in;
+                outtype out;
             }
+            u = { in };
+
+            return u.out;
         }
 
+    private:
         // Disable copy constructor.
         // To adapt C++0x, we do not specific "=delete" here.
         Injector(const Injector&);
 
-        static Injector* m_instance;
-
         InjectorCore* m_injectorCore;
 
-        std::stack<std::string> m_whenCalledFuncCode;
+        std::stack<void*> m_whenCalledFunc;
     };
 
-    Injector* Injector::m_instance = NULL;
+#define INJECTORPP_MEMBER_FUNCTION(fullyQualifiedFunctionName) \
+InjectorPP::Injector::ForceCast<void*>(&fullyQualifiedFunctionName)
 }
-
-#define INJECTORPP_SETUP() InjectorPP::Injector::Initialize()
-#define INJECTORPP_CLEANUP() InjectorPP::Injector::Uninitialize()
-#define INJECTORPP_FAKE InjectorPP::Injector::GetInstance()->Fake
-
-#define WHEN_CALLED(...) \
-	__INTERNAL_WHEN_CALLED(__VA_ARGS__, #__VA_ARGS__)
-
-#define __INTERNAL_WHEN_CALLED(function, function_call_name) \
-{\
-__nop(); \
-InjectorPP::Injector::GetInstance()->PushWhenCalledFunction(function_call_name); \
-}\
-(*InjectorPP::Injector::GetInstance())
 
 #endif

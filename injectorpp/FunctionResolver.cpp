@@ -2,6 +2,7 @@
 #include <DbgHelp.h>
 #include <sstream>
 
+#include "SymbolInfoHelper.h"
 #include "FunctionResolver.h"
 #include "Utility.h"
 
@@ -101,10 +102,40 @@ namespace InjectorPP
     FunctionResolver::FunctionResolver(HANDLE processHandle)
         : m_hProcess(processHandle)
     {
+        SymSetOptions(SYMOPT_DEBUG | SYMOPT_LOAD_ANYTHING);
     }
 
     FunctionResolver::~FunctionResolver()
     {
+    }
+
+    std::string FunctionResolver::GetMethodSymbolFromAddress(const ULONG64& funcAddress)
+    {
+        SymbolInfoHelper* pSymbolInfoHelper = new SymbolInfoHelper();
+        //PSYMBOL_INFO symbol = pSymbolInfoHelper->AllocSymbol(256);
+        
+        const size_t array_size = 256;
+        const size_t size = sizeof(SYMBOL_INFO) + (array_size - 1) * sizeof(TCHAR);
+        SYMBOL_INFO* symbol = (SYMBOL_INFO*)calloc(1, size);
+        if (!symbol)
+        {
+            //deal with it
+        }
+        symbol->SizeOfStruct = sizeof(*symbol);  //both values must
+        symbol->MaxNameLen = array_size;           //be set by user
+
+        DWORD64  dwDisplacement = 0;
+        if (SymFromAddr(this->m_hProcess, funcAddress, &dwDisplacement, symbol) == FALSE)
+        {
+            return "";
+        }
+
+        std::string functionSymName(symbol->Name, symbol->NameLen);
+
+        delete pSymbolInfoHelper;
+        pSymbolInfoHelper = NULL;
+
+        return functionSymName;
     }
 
     void FunctionResolver::Resolve(const ULONG64& modBase, const ULONG& typeIndex, Function& resolvedFunction)
@@ -127,7 +158,7 @@ namespace InjectorPP
 
         // Get function's return type.
         std::string returnType = this->ResolveReturnType(modBase, typeIndex);
-        
+
         // Get function's parameters.
         std::vector<FunctionParameter> parameters;
         this->ResolveParameters(functionAddress, modBase, typeIndex, parameters);
