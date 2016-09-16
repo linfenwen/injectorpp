@@ -175,25 +175,69 @@ namespace InjectorPP
         // '55' requires 1 byte and 'E8 <offset>' requires 5 bytes (1 byte for opcode, 4 bytes for address) 
         // so the next instruction's address is the source function address + 1 + 5.
         // The <offset> value is targetFuncAddress - <next instruction's address>.
-        ULONG64 offset = targetFuncAddress - (sourceFuncAddress + 1 + 5);
+        ULONG64 offset = targetFuncAddress - (sourceFuncAddress + 13 + 5);
 
         byte asmCommand[INJECTED_ASM_CODE_SIZE];
 
         // push ebp
         asmCommand[0] = 0x55;
 
-        // call <relative target function address>
-        asmCommand[1] = 0xE8;
-        asmCommand[2] = (offset) & 0xFF;
-        asmCommand[3] = (offset >> 8) & 0xFF;
-        asmCommand[4] = (offset >> 16) & 0xFF;
-        asmCommand[5] = (offset >> 24) & 0xFF;
+        // mov         ebp,esp
+        // sub         esp,0CCh
+        asmCommand[1] = 0x8B;
+        asmCommand[2] = 0xEC;
+        asmCommand[3] = 0x81;
+        asmCommand[4] = 0xEC;
+        asmCommand[5] = 0xCC;
+        asmCommand[6] = 0x00;
+        asmCommand[7] = 0x00;
+        asmCommand[8] = 0x00;
 
-        // pop ebp
-        asmCommand[6] = 0x5D;
+        // push        ebx
+        // push        esi
+        // push        edi
+        asmCommand[9] = 0x53;
+        asmCommand[10] = 0x56;
+        asmCommand[11] = 0x57;
+
+        // push eax
+        asmCommand[12] = 0x50;
+
+        // call <relative target function address>
+        asmCommand[13] = 0xE8;
+        asmCommand[14] = (offset) & 0xFF;
+        asmCommand[15] = (offset >> 8) & 0xFF;
+        asmCommand[16] = (offset >> 16) & 0xFF;
+        asmCommand[17] = (offset >> 24) & 0xFF;
+
+        // add esp, 4  
+        // because we pushed eax before calling target function address, 
+        // the esp should be pulled back for 4 bytes.
+        asmCommand[18] = 0x83;
+        asmCommand[19] = 0xC4;
+        asmCommand[20] = 0x04;
+
+        // pop         edi
+        // pop         esi
+        // pop         ebx
+        // add         esp,0CCh
+        // mov         esp,ebp
+        // pop         ebp
+        asmCommand[21] = 0x5F;
+        asmCommand[22] = 0x5E;
+        asmCommand[23] = 0x5B;
+        asmCommand[24] = 0x81;
+        asmCommand[25] = 0xC4;
+        asmCommand[26] = 0xCC;
+        asmCommand[27] = 0x00;
+        asmCommand[28] = 0x00;
+        asmCommand[29] = 0x00;
+        asmCommand[30] = 0x8B;
+        asmCommand[31] = 0xE5;
+        asmCommand[32] = 0x5D;
 
         // ret
-        asmCommand[7] = 0xC3;
+        asmCommand[33] = 0xC3;
 
         this->DirectWriteToFunction(sourceFuncAddress, asmCommand, INJECTED_ASM_CODE_SIZE);
     }

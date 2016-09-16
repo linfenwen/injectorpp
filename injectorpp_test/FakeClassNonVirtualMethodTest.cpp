@@ -36,7 +36,7 @@ protected:
 
 std::string FakeStringFunc2()
 {
-    return "ddd";
+    return "Fake string pointer";
 }
 
 int FakeIntFunc2()
@@ -46,7 +46,8 @@ int FakeIntFunc2()
 
 std::string FakeStringFunc1()
 {
-    return FakeStringFunc2();
+    std::string ss = "dw";
+    return ss;
 }
 
 int FakeIntFunc1()
@@ -148,3 +149,27 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringPointerFunctionWhenCalled
     delete actual;
     actual = NULL;
 }
+
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
+{
+    std::string s1 = FakeStringFunc1();
+
+    // Prepare
+    std::string expected = "Fake string pointer";
+    InjectorPP::Injector injector;
+
+    BaseClassTest b1 = BaseClassTest();
+    b1.GetAString();
+
+    injector.WhenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::GetAString))
+        .WillExecute(FakeStringFunc2);
+
+    BaseClassTest b;
+
+    // Act
+    std::string actual = b.GetAString();
+
+    // Assert
+    EXPECT_EQ(expected, actual);
+}
+
