@@ -17,6 +17,8 @@ public:
     int GetAnInteger();
 
     std::string GetAString();
+
+    std::string* GetAStringPointer();
 };
 
 #endif

@@ -168,29 +168,34 @@ namespace InjectorPP
     {
         // First important thing, backup the original asm code.
         originalFuncAsm->funcAddress = sourceFuncAddress;
-        ReadProcessMemory((HANDLE)-1, (void*)originalFuncAsm->funcAddress, originalFuncAsm->asmCode, 6, 0);
+        ReadProcessMemory((HANDLE)-1, (void*)originalFuncAsm->funcAddress, originalFuncAsm->asmCode, INJECTED_ASM_CODE_SIZE, 0);
 
         // Calculate the offset.
-        // We will inject 'E8 <offset>' to the begining of the source function.
-        // E8 opcode requires 5 bytes (1 byte for opcode, 4 bytes for address) 
-        // so the next instruction's address is the source function address + 5.
+        // We will inject '55' and 'E8 <offset>' to the begining of the source function.
+        // '55' requires 1 byte and 'E8 <offset>' requires 5 bytes (1 byte for opcode, 4 bytes for address) 
+        // so the next instruction's address is the source function address + 1 + 5.
         // The <offset> value is targetFuncAddress - <next instruction's address>.
-        ULONG64 offset = targetFuncAddress - (sourceFuncAddress + 5);
+        ULONG64 offset = targetFuncAddress - (sourceFuncAddress + 1 + 5);
 
-        byte asmCommand[6];
+        byte asmCommand[INJECTED_ASM_CODE_SIZE];
 
-        // call
-        asmCommand[0] = 0xE8;
+        // push ebp
+        asmCommand[0] = 0x55;
 
-        asmCommand[1] = (offset) & 0xFF;
-        asmCommand[2] = (offset >> 8) & 0xFF;
-        asmCommand[3] = (offset >> 16) & 0xFF;
-        asmCommand[4] = (offset >> 24) & 0xFF;
+        // call <relative target function address>
+        asmCommand[1] = 0xE8;
+        asmCommand[2] = (offset) & 0xFF;
+        asmCommand[3] = (offset >> 8) & 0xFF;
+        asmCommand[4] = (offset >> 16) & 0xFF;
+        asmCommand[5] = (offset >> 24) & 0xFF;
+
+        // pop ebp
+        asmCommand[6] = 0x5D;
 
         // ret
-        asmCommand[5] = 0xC3;
+        asmCommand[7] = 0xC3;
 
-        this->DirectWriteToFunction(sourceFuncAddress, asmCommand, 6);
+        this->DirectWriteToFunction(sourceFuncAddress, asmCommand, INJECTED_ASM_CODE_SIZE);
     }
 
     void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue, OriginalFuncASM* originalFuncAsm)

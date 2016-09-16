@@ -27,3 +27,10 @@ std::string BaseClassTest::GetAString()
 {
     return "Normal string";
 }
+
+std::string* BaseClassTest::GetAStringPointer()
+{
+    std::string* p = new std::string("Normal string pointer.");
+
+    return p;
+}

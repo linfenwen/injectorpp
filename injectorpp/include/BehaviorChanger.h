@@ -6,10 +6,12 @@
 
 namespace InjectorPP
 {
+    static const int INJECTED_ASM_CODE_SIZE = 8;
+
     struct OriginalFuncASM
     {
         ULONG64 funcAddress;
-        byte asmCode[6];
+        byte asmCode[INJECTED_ASM_CODE_SIZE];
     };
 
     class BehaviorChanger

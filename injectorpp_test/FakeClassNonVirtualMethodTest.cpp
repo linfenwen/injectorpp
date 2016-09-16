@@ -17,6 +17,13 @@ public:
         return "fake string func";
     }
 
+    std::string* FakeStringPointerFunc()
+    {
+        std::string* p = new std::string("Fake string pointer");
+
+        return p;
+    }
+
 protected:
     virtual void SetUp()
     {
@@ -121,27 +128,23 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeIntFunctionWhenCalled)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringPointerFunctionWhenCalled)
 {
     // Prepare
-    /*FakeIntFunc1();
-
-    FakeStringFunc1();
-
-    std::string expected = "fake string func";
+    std::string expected = "Fake string pointer";
     InjectorPP::Injector injector;
+    
+    injector.WhenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::GetAStringPointer))
+        .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeStringPointerFunc));
 
-    injector.WhenCalled(&FakeStringFunc1)
-        .WillExecute(&FakeStringFunc2);
+    BaseClassTest b = BaseClassTest();
 
-    BaseClassTest b;
-
-    int a = FakeIntFunc1();
-
-    std::string actual = FakeStringFunc1();
     // Act
-    //std::string actual = b.GetAString();
+    std::string* actual = b.GetAStringPointer();
 
     // Assert
-    EXPECT_EQ(expected, actual);*/
+    EXPECT_EQ(expected, *actual);
+
+    delete actual;
+    actual = NULL;
 }
