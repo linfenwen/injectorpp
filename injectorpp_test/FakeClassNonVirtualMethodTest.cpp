@@ -39,76 +39,10 @@ std::string FakeStringFunc2()
     return "Fake string pointer";
 }
 
-int FakeIntFunc2()
-{
-    return 2;
-}
-
 std::string FakeStringFunc1()
 {
     std::string ss = "dw";
     return ss;
-}
-
-int FakeIntFunc1()
-{
-    return FakeIntFunc2();
-}
-
-TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithIntReturnDefaultValue)
-{
-    // Prepare
-    /*Address* fakeAddress = INJECTORPP_FAKE<Address>();
-    int expected = 0;
-
-    // Act
-    int actual = fakeAddress->GetZipCode();
-
-    // Assert
-    EXPECT_EQ(expected, actual);*/
-}
-
-TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithIntNotReturnDefaultValue)
-{
-    // Prepare
-    /*Address* fakeAddress = INJECTORPP_FAKE<Address>(false);
-    int expected = -1;
-
-    // Act
-    int actual = fakeAddress->GetZipCode();
-
-    // Assert
-    EXPECT_EQ(expected, actual);*/
-}
-
-TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithCCharReturnDefaultValue)
-{
-    // Prepare
-    /*Address* fakeAddress = INJECTORPP_FAKE<Address>();
-    char* expected = "aa";
-
-    WHEN_CALLED(fakeAddress->GetCity()).Return(expected);
-
-    // Act
-    char* actual = fakeAddress->GetCity();
-
-    // Assert
-    EXPECT_EQ(std::string(expected), std::string(actual));*/
-}
-
-TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionWithStringReturnDefaultValue)
-{
-    // Prepare
-    /*Address* fakeAddress = INJECTORPP_FAKE<Address>();
-    std::string expected("expectedString");
-
-    WHEN_CALLED(fakeAddress->GetCapitalCityByCountry("")).Return(&expected);
-
-    // Act
-    std::string* actual = fakeAddress->GetCapitalCityByCountry("");
-
-    // Assert
-    EXPECT_EQ(expected, *actual);*/
 }
 
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeIntFunctionWhenCalled)
@@ -150,7 +84,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringPointerFunctionWhenCalled
     actual = NULL;
 }
 
-TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
+/*TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
 {
     std::string s1 = FakeStringFunc1();
 
@@ -171,5 +105,5 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
 
     // Assert
     EXPECT_EQ(expected, actual);
-}
+}*/
 

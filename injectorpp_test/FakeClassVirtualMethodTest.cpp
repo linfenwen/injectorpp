@@ -71,7 +71,7 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
     derived = NULL;
 }
 
-TEST_F(FakeClassVirtualMethodTestFixture, MockBaseClassVirtualMemberFunctionReturnStringWhenCalled)
+/*TEST_F(FakeClassVirtualMethodTestFixture, MockBaseClassVirtualMemberFunctionReturnStringWhenCalled)
 {
     // Prepare
     std::string expected = "Faked base string";
@@ -89,4 +89,4 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockBaseClassVirtualMemberFunctionRetu
 
     delete base;
     base = NULL;
-}
+}*/

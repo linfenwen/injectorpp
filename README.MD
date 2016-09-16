@@ -3,62 +3,75 @@
 Injector++ is a library to help you fake non-virtual methods, static methods and global functions without changing existing code.
 
 ## How to use
-It's extremely easy to mock all methods of a class via Injector++. Just one line of code:
+It's extremely easy to mock class methods via Injector++.
 
-```cpp
-Address* fakeAddress = INJECTORPP_FAKE<Address>();
-```
+### Mock non-virtual methods
 
-*Address* is the class to mock. Calling INJECTORPP_FAKE will make all methods of Address as fake functions. That is, a function return int will return 0, a function return char* or std::string will return "", and etc.
-
-Below example will demonstrate the magic (This example leveraging googletest as the test runner):
+Below example mocks BaseClassTest::GetAnInteger() by using FakeFunc():
 
 ```cpp
 
-#include "gmock/gmock.h"
-#include "Injector.h"
-#include "Address.h"
-
-class AddressTestFixture : public ::testing::Test
+class FakeClassNonVirtualMethodTestFixture : public ::testing::Test
 {
-protected:
-    virtual void SetUp()
+public:
+    int FakeFunc()
     {
-        INJECTORPP_SETUP();
-    }
-
-    virtual void TearDown()
-    {
-        INJECTORPP_CLEANUP();
+        return 6;
     }
 };
 
-TEST_F(AddressTestFixture, MyTest)
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeIntFunctionWhenCalled)
 {
-    Address* fakeAddress = INJECTORPP_FAKE<Address>();
+    // Prepare
+    int expected = 6;
+    InjectorPP::Injector injector;
 
-    // Will return 0 instead of the real implementation!
-    std::cout << fakeAddress->GetZipCode() << std::endl;
+    injector.WhenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::GetAnInteger))
+        .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeFunc));
 
-    // Will return "" instead of the real implementation!
-    std::cout << fakeAddress->GetCity() << std::endl;
+    BaseClassTest b = BaseClassTest();
 
-    // Will return "" instead of the real implementation!
-    std::cout << fakeAddress->GetCapitalCityByCountry("") << std::endl;
+    // Act
+	// FakeFunc will be executed!
+    int actual = b.GetAnInteger();
+
+    // Assert
+    EXPECT_EQ(expected, actual);
 }
 
 ```
-Just put INJECTORPP_SETUP() into Setup() and put INJECTORPP_CLEANUP() into TearDown(). You're ready!
 
-More over, to specific a return value for a method is simple as well:
+### Mock virtual methods
+Injector++ supports virtual method mocking (Amazing, huh?). Below is a simple example:
 
 ```cpp
-Address* fakeAddress = INJECTORPP_FAKE<Address>();
 
-WHEN_CALLED(fakeAddress->GetMyCode()).Return(100);
+int FakeIntFuncForDerived()
+{
+    return 2;
+}
 
-// myCode will always be 100.
-int myCode = fakeAddress->GetMyCode();
+TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionWhenCalled)
+{
+    // Prepare
+    int expected = 2;
+    BaseClassTest* derived = new SubClassTest();
+
+    InjectorPP::Injector injector;
+    injector.WhenCalledVirtualMethod(derived, "GetAnIntegerVirtual")
+        .WillExecute(FakeIntFuncForDerived);
+
+    // Act
+    int actual = derived->GetAnIntegerVirtual();
+
+    // Assert
+	// FakeIntFuncForDerived() will be exectued!
+    EXPECT_EQ(expected, derived->GetAnIntegerVirtual());
+
+    delete derived;
+    derived = NULL;
+}
+
 ```
 
 ## Prerequisites
@@ -68,6 +81,12 @@ int myCode = fakeAddress->GetMyCode();
 > In Visual Studio, open project property dialog, select Configuration Properties -> Linker -> Debuggin, change Generate Debug Info to "true"
 
 > Add dbgHelp.lib as dependency in your test project setting.
+
+> Project property dialog -> Linker -> General -> Enable Incremental Linking -> *No (/INCREMENTAL:NO)*.
+
+## Known issue
+Currently, Injector++ only supports those functions return void or primitive types (int, char, pointers). 
+The support of functions return copy of std class or user-defined class will be added soon.
 
 ## Roadmap
 There's a headache of C++ unit testing - No way to abstract the legacy code. As there's no reflection in C++, it is not that easy to change the behavior of non-virtual and static methods, which makes C++ unit testing extremely hard.
