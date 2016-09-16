@@ -1,6 +1,6 @@
 # Injector++
 
-Injector++ is a library to help you fake non-virtual methods, static methods and global functions without changing existing code.
+Injector++ is a library to help you fake virtual/non-virtual methods, static methods and global functions without changing existing code.
 
 ## How to use
 It's extremely easy to mock class methods via Injector++.
