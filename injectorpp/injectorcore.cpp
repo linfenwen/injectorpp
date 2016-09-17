@@ -90,6 +90,11 @@ namespace InjectorPP
         }
     }
 
+    std::string InjectorCore::GetMethodReturnType(void* srcFunc)
+    {
+        return this->m_functionResolver->GetMethodReturnTypeFromAddress((ULONG64)srcFunc);
+    }
+
     void* InjectorCore::GetVirtualMethodAddress(void* classInstance, const std::string& virtualMethodName)
     {
         void* result = NULL;
@@ -126,13 +131,23 @@ namespace InjectorPP
         return result;
     }
 
-    void InjectorCore::ReplaceFunction(void* srcFunc, void* destFunc)
+    void InjectorCore::ReplaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction)
     {
+        bool isComplexReturn = false;
+        if (isSourceMemberFunction)
+        {
+            std::string returnType = this->m_functionResolver->GetMethodReturnTypeFromAddress((ULONG64)srcFunc);
+            if (returnType == "std::basic_string<char,std::char_traits<char>,std::allocator<char> >")
+            {
+                isComplexReturn = true;
+            }
+        }
+
         // Save the original asm code. 
         // Useful when we recover the function behavior.
         OriginalFuncASM* originalFuncAsm = new OriginalFuncASM();
 
-        this->m_behaviorChanger->ReplaceFunction((ULONG64)srcFunc, (ULONG64)destFunc, originalFuncAsm);
+        this->m_behaviorChanger->ReplaceFunction((ULONG64)srcFunc, (ULONG64)destFunc, originalFuncAsm, isComplexReturn);
 
         if (!this->SaveOriginalFuncASM(originalFuncAsm))
         {

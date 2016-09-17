@@ -11,6 +11,7 @@ namespace InjectorPP
     {
     public:
         virtual std::string GetMethodSymbolFromAddress(const ULONG64& funcAddress) = 0;
+        virtual std::string GetMethodReturnTypeFromAddress(const ULONG64& funcAddress) = 0;
         virtual void Resolve(const ULONG64& modBase, const ULONG& typeIndex, Function& resolvedFunction) = 0;
     };
 }

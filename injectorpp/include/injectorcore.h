@@ -26,7 +26,9 @@ namespace InjectorPP
 
         void* GetVirtualMethodAddress(void* classInstance, const std::string& virtualMethodName);
 
-        void ReplaceFunction(void* srcFunc, void* destFunc);
+        std::string GetMethodReturnType(void* srcFunc);
+
+        void ReplaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction);
 
         void* Fake(const char* typeName, size_t typeSize, bool autoFillDefaultValue);
 

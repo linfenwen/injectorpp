@@ -20,6 +20,8 @@ namespace InjectorPP
 
         virtual std::string GetMethodSymbolFromAddress(const ULONG64& funcAddress);
 
+        virtual std::string GetMethodReturnTypeFromAddress(const ULONG64& funcAddress);
+
     protected:
         // Resolve the function return type.
         virtual std::string ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex);

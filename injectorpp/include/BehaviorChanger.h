@@ -10,8 +10,23 @@ namespace InjectorPP
 
     struct OriginalFuncASM
     {
+        OriginalFuncASM()
+            :funcAddress(0),
+            asmCode(NULL)
+        {
+        }
+
+        ~OriginalFuncASM()
+        {
+            if (asmCode != NULL)
+            {
+                delete[] asmCode;
+                asmCode = NULL;
+            }
+        }
+
         ULONG64 funcAddress;
-        byte asmCode[INJECTED_ASM_CODE_SIZE];
+        byte* asmCode;
     };
 
     class BehaviorChanger
@@ -30,7 +45,7 @@ namespace InjectorPP
 
         void ChangeFunctionReturnValue(ULONG64 funcAddress, const void* expectedReturnValue, OriginalFuncASM* originalFuncAsm);
 
-        void ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm);
+        void ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, bool isComplexReturn);
 
         void DirectWriteToFunction(ULONG64 funcAddress, const byte* asmCode, size_t asmCodeSize);
     private:

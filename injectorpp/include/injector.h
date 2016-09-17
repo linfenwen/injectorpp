@@ -8,6 +8,12 @@
 
 namespace InjectorPP
 {
+    struct FunctionWrapper
+    {
+        void* functionAddress;
+        bool isMemberFunction;
+    };
+
     class Injector
     {
     public:
@@ -25,23 +31,41 @@ namespace InjectorPP
                 delete this->m_injectorCore;
                 this->m_injectorCore = NULL;
             }
+
+            // Prevent memory leak.
+            while (this->m_whenCalledFunc.size() > 0)
+            {
+                FunctionWrapper* item = this->m_whenCalledFunc.top();
+                this->m_whenCalledFunc.pop();
+
+                delete item;
+                item = NULL;
+            }
         }
 
-        Injector& WhenCalled(void* srcMockFunc)
+        Injector& WhenCalled(void* srcMockFunc, bool isMemberFunction = false)
         {
-            this->m_whenCalledFunc.push(srcMockFunc);
+            FunctionWrapper* functionWrapper = new FunctionWrapper();
+            functionWrapper->functionAddress = srcMockFunc;
+            functionWrapper->isMemberFunction = isMemberFunction;
+            this->m_whenCalledFunc.push(functionWrapper);
             return *this;
         }
 
         Injector& WhenCalledVirtualMethod(void* classInstance, const std::string& virtualMethodName)
         {
             void* virtualFunction = this->m_injectorCore->GetVirtualMethodAddress(classInstance, virtualMethodName);
-            this->m_whenCalledFunc.push(virtualFunction);
+
+            FunctionWrapper* functionWrapper = new FunctionWrapper();
+            functionWrapper->functionAddress = virtualFunction;
+            functionWrapper->isMemberFunction = true;
+
+            this->m_whenCalledFunc.push(functionWrapper);
 
             return *this;
         }
 
-        Injector& WillExecute(void* destMockFunc)
+        Injector& WillExecute(void* destMockFunc, bool isMemberFunction = false)
         {
             if (this->m_whenCalledFunc.empty())
             {
@@ -53,10 +77,13 @@ namespace InjectorPP
                 throw;
             }
 
-            void* srcMockFunc = this->m_whenCalledFunc.top();
+            FunctionWrapper* srcFunctionWrapper = this->m_whenCalledFunc.top();
             this->m_whenCalledFunc.pop();
 
-            this->m_injectorCore->ReplaceFunction(srcMockFunc, destMockFunc);
+            this->m_injectorCore->ReplaceFunction(srcFunctionWrapper->functionAddress, destMockFunc, srcFunctionWrapper->isMemberFunction);
+
+            delete srcFunctionWrapper;
+            srcFunctionWrapper = NULL;
 
             return *this;
         }
@@ -106,13 +133,13 @@ namespace InjectorPP
             this->m_injectorCore->ChangeFunctionReturnValue(funcCallCode, expectedReturnValue);
         }*/
 
-        template<typename outtype, typename intype>
-        static outtype ForceCast(intype in)
+        template<typename OUTTYPE, typename INTYPE>
+        static OUTTYPE ForceCast(INTYPE in)
         {
             union
             {
-                intype  in;
-                outtype out;
+                INTYPE  in;
+                OUTTYPE out;
             }
             u = { in };
 
@@ -126,11 +153,11 @@ namespace InjectorPP
 
         InjectorCore* m_injectorCore;
 
-        std::stack<void*> m_whenCalledFunc;
+        std::stack<FunctionWrapper*> m_whenCalledFunc;
     };
 
 #define INJECTORPP_MEMBER_FUNCTION(fullyQualifiedFunctionName) \
-InjectorPP::Injector::ForceCast<void*>(&fullyQualifiedFunctionName)
+InjectorPP::Injector::ForceCast<void*>(&fullyQualifiedFunctionName), true
 }
 
 #endif

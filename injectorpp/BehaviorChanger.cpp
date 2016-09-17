@@ -164,11 +164,19 @@ namespace InjectorPP
         //WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCommand, 6, 0);
     //}
 
-    void BehaviorChanger::ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm)
+    void BehaviorChanger::ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, bool isComplexReturn)
     {
+        int injectedCodeSize = INJECTED_ASM_CODE_SIZE;
+        if (isComplexReturn)
+        {
+            injectedCodeSize += 2;
+        }
+
+        originalFuncAsm->asmCode = new byte[injectedCodeSize];
+
         // First important thing, backup the original asm code.
         originalFuncAsm->funcAddress = sourceFuncAddress;
-        ReadProcessMemory((HANDLE)-1, (void*)originalFuncAsm->funcAddress, originalFuncAsm->asmCode, INJECTED_ASM_CODE_SIZE, 0);
+        ReadProcessMemory((HANDLE)-1, (void*)originalFuncAsm->funcAddress, originalFuncAsm->asmCode, injectedCodeSize, 0);
 
         // Calculate the offset.
         // We will inject '55' and 'E8 <offset>' to the begining of the source function.
@@ -177,7 +185,7 @@ namespace InjectorPP
         // The <offset> value is targetFuncAddress - <next instruction's address>.
         ULONG64 offset = targetFuncAddress - (sourceFuncAddress + 13 + 5);
 
-        byte asmCommand[INJECTED_ASM_CODE_SIZE];
+        byte* asmCommand = new byte[injectedCodeSize];
 
         // push ebp
         asmCommand[0] = 0x55;
@@ -237,9 +245,21 @@ namespace InjectorPP
         asmCommand[32] = 0x5D;
 
         // ret
-        asmCommand[33] = 0xC3;
+        if (isComplexReturn)
+        {
+            asmCommand[33] = 0xC2;
+            asmCommand[34] = 0x04;
+            asmCommand[35] = 0x00;
+        }
+        else
+        {
+            asmCommand[33] = 0xC3;
+        }
 
-        this->DirectWriteToFunction(sourceFuncAddress, asmCommand, INJECTED_ASM_CODE_SIZE);
+        this->DirectWriteToFunction(sourceFuncAddress, asmCommand, injectedCodeSize);
+
+        delete[] asmCommand;
+        asmCommand = NULL;
     }
 
     void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue, OriginalFuncASM* originalFuncAsm)

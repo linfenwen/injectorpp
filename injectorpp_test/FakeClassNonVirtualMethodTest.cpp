@@ -45,6 +45,17 @@ std::string FakeStringFunc1()
     return ss;
 }
 
+
+std::string FooReturnString()
+{
+    return "FooReturnString";
+}
+
+std::string FakeFooReturnString()
+{
+    return "FakeFooReturnString";
+}
+
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeIntFunctionWhenCalled)
 {
     // Prepare
@@ -84,10 +95,24 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringPointerFunctionWhenCalled
     actual = NULL;
 }
 
-/*TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeGlobalStringFunctionWhenCalled)
 {
-    std::string s1 = FakeStringFunc1();
+    // Prepare
+    std::string expected = "FakeFooReturnString";
+    InjectorPP::Injector injector;
 
+    injector.WhenCalled(FooReturnString)
+        .WillExecute(FakeFooReturnString);
+
+    // Act
+    std::string actual = FooReturnString();
+
+    // Assert
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
+{
     // Prepare
     std::string expected = "Fake string pointer";
     InjectorPP::Injector injector;
@@ -105,5 +130,5 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringPointerFunctionWhenCalled
 
     // Assert
     EXPECT_EQ(expected, actual);
-}*/
+}
 

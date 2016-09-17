@@ -109,6 +109,35 @@ namespace InjectorPP
     {
     }
 
+    std::string FunctionResolver::GetMethodReturnTypeFromAddress(const ULONG64& funcAddress)
+    {
+        SymbolInfoHelper* pSymbolInfoHelper = new SymbolInfoHelper();
+        //PSYMBOL_INFO symbol = pSymbolInfoHelper->AllocSymbol(256);
+
+        const size_t array_size = 256;
+        const size_t size = sizeof(SYMBOL_INFO) + (array_size - 1) * sizeof(TCHAR);
+        SYMBOL_INFO* symbol = (SYMBOL_INFO*)calloc(1, size);
+        if (!symbol)
+        {
+            //deal with it
+        }
+        symbol->SizeOfStruct = sizeof(*symbol);  //both values must
+        symbol->MaxNameLen = array_size;           //be set by user
+
+        DWORD64  dwDisplacement = 0;
+        if (SymFromAddr(this->m_hProcess, funcAddress, &dwDisplacement, symbol) == FALSE)
+        {
+            return "";
+        }
+
+        std::string returnType = this->ResolveReturnType(symbol->ModBase, symbol->TypeIndex);
+
+        delete pSymbolInfoHelper;
+        pSymbolInfoHelper = NULL;
+
+        return returnType;
+    }
+
     std::string FunctionResolver::GetMethodSymbolFromAddress(const ULONG64& funcAddress)
     {
         SymbolInfoHelper* pSymbolInfoHelper = new SymbolInfoHelper();
@@ -184,17 +213,13 @@ namespace InjectorPP
     {
         // Let's resolve return type.
 
-        // First, let's find the function type index.
-        ULONG functionTypeIndex = 0;
-        SymGetTypeInfo(this->m_hProcess, modBase, typeIndex, TI_GET_TYPE, &functionTypeIndex);
-
-        // Function return type is the sub type of the function.
-        ULONG returnTypeIndex = 0;
-        SymGetTypeInfo(this->m_hProcess, modBase, functionTypeIndex, TI_GET_TYPE, &returnTypeIndex);
+        // First, let's find the function return type index.
+        ULONG functionReturnTypeIndex = 0;
+        SymGetTypeInfo(this->m_hProcess, modBase, typeIndex, TI_GET_TYPEID, &functionReturnTypeIndex);
 
         // We got the return type index, now resolve it as string.
         std::string returnTypeString;
-        this->LoadType(modBase, returnTypeIndex, returnTypeString);
+        this->LoadType(modBase, functionReturnTypeIndex, returnTypeString);
 
         return returnTypeString;
     }
