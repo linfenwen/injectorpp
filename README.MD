@@ -85,8 +85,8 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
 > Project property dialog -> Linker -> General -> Enable Incremental Linking -> *No (/INCREMENTAL:NO)*.
 
 ## Known issue
-Currently, Injector++ only supports those functions return void or primitive types (int, char, pointers). 
-The support of functions return copy of std class or user-defined class will be added soon.
+For virtual methods, Injector++ only supports those functions return void or primitive types (int, char, pointers). 
+Virtual methods return copy of std class or user-defined class will be added soon.
 
 ## Roadmap
 There's a headache of C++ unit testing - No way to abstract the legacy code. As there's no reflection in C++, it is not that easy to change the behavior of non-virtual and static methods, which makes C++ unit testing extremely hard.
