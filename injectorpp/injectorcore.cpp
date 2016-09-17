@@ -126,7 +126,7 @@ namespace InjectorPP
         return result;
     }
 
-    void InjectorCore::ReplaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction, bool isSourceStaticMemberFunction)
+    void InjectorCore::ReplaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction, bool isSourceStaticMemberFunction, bool isSourceVirtualMemberFunction)
     {
         bool isComplexReturn = false;
         if (isSourceMemberFunction && !isSourceStaticMemberFunction)
@@ -143,7 +143,7 @@ namespace InjectorPP
         // Useful when we recover the function behavior.
         OriginalFuncASM* originalFuncAsm = new OriginalFuncASM();
 
-        this->m_behaviorChanger->ReplaceFunction((ULONG64)srcFunc, (ULONG64)destFunc, originalFuncAsm, isComplexReturn);
+        this->m_behaviorChanger->ReplaceFunction((ULONG64)srcFunc, (ULONG64)destFunc, originalFuncAsm, isComplexReturn, isSourceVirtualMemberFunction);
 
         if (!this->SaveOriginalFuncASM(originalFuncAsm))
         {

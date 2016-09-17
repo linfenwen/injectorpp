@@ -166,15 +166,8 @@ namespace InjectorPP
         //WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCommand, 6, 0);
     //}
 
-    void BehaviorChanger::ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, bool isComplexReturn)
+    void BehaviorChanger::ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, bool isComplexReturn, bool isSourceFuncVirtualMethod)
     {
-        // Calculate the offset.
-        // We will inject '55' and 'E8 <offset>' to the begining of the source function.
-        // '55' requires 1 byte and 'E8 <offset>' requires 5 bytes (1 byte for opcode, 4 bytes for address) 
-        // so the next instruction's address is the source function address + 1 + 5.
-        // The <offset> value is targetFuncAddress - <next instruction's address>.
-        ULONG64 offset = targetFuncAddress - (sourceFuncAddress + 13 + 5);
-
         //byte* asmCommand = new byte[injectedCodeSize];
         vector<byte> asmCommand;
 
@@ -200,8 +193,26 @@ namespace InjectorPP
         asmCommand.push_back(0x56);
         asmCommand.push_back(0x57);
 
+        if (isComplexReturn && isSourceFuncVirtualMethod)
+        {
+            // mov         eax,dword ptr [ebp+8]
+            asmCommand.push_back(0x8B);
+            asmCommand.push_back(0x45);
+            asmCommand.push_back(0x08);
+        }
+
         // push eax
         asmCommand.push_back(0x50);
+
+        int preparationCodeLength = asmCommand.size();
+
+        // Calculate the offset.
+        // We will inject preparation code to the begining of the source function.
+        // 'E8 <offset>' requires 5 bytes (1 byte for opcode, 4 bytes for address) 
+        // so the next instruction's address is the source function address + preparationCodeLength + 5.
+        // The <offset> value is targetFuncAddress - <next instruction's address>.
+        ULONG64 offset = targetFuncAddress - (sourceFuncAddress + preparationCodeLength + 5);
+
 
         // call <relative target function address>
         asmCommand.push_back(0xE8);

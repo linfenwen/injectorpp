@@ -13,6 +13,7 @@ namespace InjectorPP
         void* functionAddress;
         bool isMemberFunction;
         bool isStaticMemberFunction;
+        bool isVirtualMemberFunction;
     };
 
     class Injector
@@ -50,7 +51,10 @@ namespace InjectorPP
             functionWrapper->functionAddress = srcMockFunc;
             functionWrapper->isMemberFunction = isMemberFunction;
             functionWrapper->isStaticMemberFunction = isStaticMemberFunction;
+            functionWrapper->isVirtualMemberFunction = false;
+
             this->m_whenCalledFunc.push(functionWrapper);
+
             return *this;
         }
 
@@ -62,6 +66,7 @@ namespace InjectorPP
             functionWrapper->functionAddress = virtualFunction;
             functionWrapper->isMemberFunction = true;
             functionWrapper->isStaticMemberFunction = false;
+            functionWrapper->isVirtualMemberFunction = true;
 
             this->m_whenCalledFunc.push(functionWrapper);
 
@@ -86,7 +91,8 @@ namespace InjectorPP
             this->m_injectorCore->ReplaceFunction(srcFunctionWrapper->functionAddress,
                 destMockFunc,
                 srcFunctionWrapper->isMemberFunction,
-                srcFunctionWrapper->isStaticMemberFunction);
+                srcFunctionWrapper->isStaticMemberFunction,
+                srcFunctionWrapper->isVirtualMemberFunction);
 
             delete srcFunctionWrapper;
             srcFunctionWrapper = NULL;

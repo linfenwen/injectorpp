@@ -26,7 +26,7 @@ namespace InjectorPP
 
         void* GetVirtualMethodAddress(void* classInstance, const std::string& virtualMethodName);
 
-        void ReplaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction, bool isSourceStaticMemberFunction);
+        void ReplaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction, bool isSourceStaticMemberFunction, bool isSourceVirtualMemberFunction);
 
     private:
         InjectorCore(const InjectorCore&);
