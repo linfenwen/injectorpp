@@ -1,8 +1,10 @@
-#include "BehaviorChanger.h"
 #include <iostream>
+#include <vector>
+
+#include "BehaviorChanger.h"
 #include "FakeFunctions.h"
 
-static std::string* tt = new std::string("a");
+using std::vector;
 
 namespace InjectorPP
 {
@@ -166,18 +168,6 @@ namespace InjectorPP
 
     void BehaviorChanger::ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, bool isComplexReturn)
     {
-        int injectedCodeSize = INJECTED_ASM_CODE_SIZE;
-        if (isComplexReturn)
-        {
-            injectedCodeSize += 2;
-        }
-
-        originalFuncAsm->asmCode = new byte[injectedCodeSize];
-
-        // First important thing, backup the original asm code.
-        originalFuncAsm->funcAddress = sourceFuncAddress;
-        ReadProcessMemory((HANDLE)-1, (void*)originalFuncAsm->funcAddress, originalFuncAsm->asmCode, injectedCodeSize, 0);
-
         // Calculate the offset.
         // We will inject '55' and 'E8 <offset>' to the begining of the source function.
         // '55' requires 1 byte and 'E8 <offset>' requires 5 bytes (1 byte for opcode, 4 bytes for address) 
@@ -185,45 +175,47 @@ namespace InjectorPP
         // The <offset> value is targetFuncAddress - <next instruction's address>.
         ULONG64 offset = targetFuncAddress - (sourceFuncAddress + 13 + 5);
 
-        byte* asmCommand = new byte[injectedCodeSize];
+        //byte* asmCommand = new byte[injectedCodeSize];
+        vector<byte> asmCommand;
 
         // push ebp
-        asmCommand[0] = 0x55;
+        asmCommand.push_back(0x55);
 
         // mov         ebp,esp
         // sub         esp,0CCh
-        asmCommand[1] = 0x8B;
-        asmCommand[2] = 0xEC;
-        asmCommand[3] = 0x81;
-        asmCommand[4] = 0xEC;
-        asmCommand[5] = 0xCC;
-        asmCommand[6] = 0x00;
-        asmCommand[7] = 0x00;
-        asmCommand[8] = 0x00;
+        asmCommand.push_back(0x8B);
+
+        asmCommand.push_back(0xEC);
+        asmCommand.push_back(0x81);
+        asmCommand.push_back(0xEC);
+        asmCommand.push_back(0xCC);
+        asmCommand.push_back(0x00);
+        asmCommand.push_back(0x00);
+        asmCommand.push_back(0x00);
 
         // push        ebx
         // push        esi
         // push        edi
-        asmCommand[9] = 0x53;
-        asmCommand[10] = 0x56;
-        asmCommand[11] = 0x57;
+        asmCommand.push_back(0x53);
+        asmCommand.push_back(0x56);
+        asmCommand.push_back(0x57);
 
         // push eax
-        asmCommand[12] = 0x50;
+        asmCommand.push_back(0x50);
 
         // call <relative target function address>
-        asmCommand[13] = 0xE8;
-        asmCommand[14] = (offset) & 0xFF;
-        asmCommand[15] = (offset >> 8) & 0xFF;
-        asmCommand[16] = (offset >> 16) & 0xFF;
-        asmCommand[17] = (offset >> 24) & 0xFF;
+        asmCommand.push_back(0xE8);
+        asmCommand.push_back((offset) & 0xFF);
+        asmCommand.push_back((offset >> 8) & 0xFF);
+        asmCommand.push_back((offset >> 16) & 0xFF);
+        asmCommand.push_back((offset >> 24) & 0xFF);
 
         // add esp, 4  
         // because we pushed eax before calling target function address, 
         // the esp should be pulled back for 4 bytes.
-        asmCommand[18] = 0x83;
-        asmCommand[19] = 0xC4;
-        asmCommand[20] = 0x04;
+        asmCommand.push_back(0x83);
+        asmCommand.push_back(0xC4);
+        asmCommand.push_back(0x04);
 
         // pop         edi
         // pop         esi
@@ -231,35 +223,40 @@ namespace InjectorPP
         // add         esp,0CCh
         // mov         esp,ebp
         // pop         ebp
-        asmCommand[21] = 0x5F;
-        asmCommand[22] = 0x5E;
-        asmCommand[23] = 0x5B;
-        asmCommand[24] = 0x81;
-        asmCommand[25] = 0xC4;
-        asmCommand[26] = 0xCC;
-        asmCommand[27] = 0x00;
-        asmCommand[28] = 0x00;
-        asmCommand[29] = 0x00;
-        asmCommand[30] = 0x8B;
-        asmCommand[31] = 0xE5;
-        asmCommand[32] = 0x5D;
+        asmCommand.push_back(0x5F);
+        asmCommand.push_back(0x5E);
+        asmCommand.push_back(0x5B);
+        asmCommand.push_back(0x81);
+        asmCommand.push_back(0xC4);
+        asmCommand.push_back(0xCC);
+        asmCommand.push_back(0x00);
+        asmCommand.push_back(0x00);
+        asmCommand.push_back(0x00);
+        asmCommand.push_back(0x8B);
+        asmCommand.push_back(0xE5);
+        asmCommand.push_back(0x5D);
 
         // ret
         if (isComplexReturn)
         {
-            asmCommand[33] = 0xC2;
-            asmCommand[34] = 0x04;
-            asmCommand[35] = 0x00;
+            asmCommand.push_back(0xC2);
+            asmCommand.push_back(0x04);
+            asmCommand.push_back(0x00);
         }
         else
         {
-            asmCommand[33] = 0xC3;
+            asmCommand.push_back(0xC3);
         }
 
-        this->DirectWriteToFunction(sourceFuncAddress, asmCommand, injectedCodeSize);
+        int injectedCodeSize = asmCommand.size();
 
-        delete[] asmCommand;
-        asmCommand = NULL;
+        // First important thing, backup the original asm code.
+        originalFuncAsm->asmCode = new byte[injectedCodeSize];
+        originalFuncAsm->funcAddress = sourceFuncAddress;
+        ReadProcessMemory((HANDLE)-1, (void*)originalFuncAsm->funcAddress, originalFuncAsm->asmCode, injectedCodeSize, 0);
+
+        // Then inject the code to source function.
+        this->DirectWriteToFunction(sourceFuncAddress, &asmCommand[0], injectedCodeSize);
     }
 
     void BehaviorChanger::ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue, OriginalFuncASM* originalFuncAsm)

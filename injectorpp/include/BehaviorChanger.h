@@ -6,8 +6,6 @@
 
 namespace InjectorPP
 {
-    static const int INJECTED_ASM_CODE_SIZE = 34;
-
     struct OriginalFuncASM
     {
         OriginalFuncASM()

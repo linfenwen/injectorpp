@@ -27,10 +27,10 @@
     <ClCompile Include="Fixtures\SubClassTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FakeClassNonVirtualMethodTest.cpp">
+    <ClCompile Include="FakeClassVirtualMethodTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FakeClassVirtualMethodTest.cpp">
+    <ClCompile Include="FakeClassNonVirtualMethodTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

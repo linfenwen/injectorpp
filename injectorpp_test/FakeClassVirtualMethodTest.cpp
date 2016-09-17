@@ -77,6 +77,8 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
     std::string expected = "Faked base string";
     BaseClassTest* base = new BaseClassTest();
 
+    std::string a1 = base->GetStringVirtual();
+
     InjectorPP::Injector injector;
     injector.WhenCalledVirtualMethod(base, "GetStringVirtual")
         .WillExecute(FakeStringFuncForBase);
