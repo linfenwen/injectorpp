@@ -159,10 +159,8 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefined
     injector.WhenCalled(INJECTORPP_STATIC_MEMBER_FUNCTION(BaseClassTest::GetAnAddressStatic))
         .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeGetAnAddress));
 
-    BaseClassTest b;
-
     // Act
-    Address actual = b.GetAnAddressStatic();
+    Address actual = BaseClassTest::GetAnAddressStatic();
 
     // Assert
     EXPECT_EQ(expected, actual);
