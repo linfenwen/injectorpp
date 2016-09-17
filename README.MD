@@ -62,11 +62,11 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
         .WillExecute(FakeIntFuncForDerived);
 
     // Act
+	// FakeIntFuncForDerived() will be exectued!
     int actual = derived->GetAnIntegerVirtual();
 
     // Assert
-	// FakeIntFuncForDerived() will be exectued!
-    EXPECT_EQ(expected, derived->GetAnIntegerVirtual());
+    EXPECT_EQ(expected, actual);
 
     delete derived;
     derived = NULL;

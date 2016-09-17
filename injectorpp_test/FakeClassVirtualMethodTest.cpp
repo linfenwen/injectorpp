@@ -65,7 +65,7 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
     int actual = derived->GetAnIntegerVirtual();
 
     // Assert
-    EXPECT_EQ(expected, derived->GetAnIntegerVirtual());
+    EXPECT_EQ(expected, actual);
 
     delete derived;
     derived = NULL;
