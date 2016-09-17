@@ -2,6 +2,7 @@
 #define INJECTORPPTEST_FIXTURES_BASECLASSTEST_H
 
 #include <string>
+#include "Address.h"
 
 class BaseClassTest
 {
@@ -19,6 +20,8 @@ public:
     std::string GetAString();
 
     std::string* GetAStringPointer();
+
+    Address GetAnAddress();
 };
 
 #endif

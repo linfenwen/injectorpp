@@ -14,7 +14,7 @@ public:
 
     std::string FakeStringFunc()
     {
-        return "fake string func";
+        return "Fake string func";
     }
 
     std::string* FakeStringPointerFunc()
@@ -22,6 +22,15 @@ public:
         std::string* p = new std::string("Fake string pointer");
 
         return p;
+    }
+
+    Address FakeGetAnAddress()
+    {
+        Address addr;
+        addr.SetAddressLine("fakeAddressLine");
+        addr.SetZipCode("fakeZipCode");
+
+        return addr;
     }
 
 protected:
@@ -33,18 +42,6 @@ protected:
     {
     }
 };
-
-std::string FakeStringFunc2()
-{
-    return "Fake string pointer";
-}
-
-std::string FakeStringFunc1()
-{
-    std::string ss = "dw";
-    return ss;
-}
-
 
 std::string FooReturnString()
 {
@@ -114,19 +111,37 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeGlobalStringFunctionWhenCalled)
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
 {
     // Prepare
-    std::string expected = "Fake string pointer";
+    std::string expected = "Fake string func";
     InjectorPP::Injector injector;
 
-    BaseClassTest b1 = BaseClassTest();
-    b1.GetAString();
-
     injector.WhenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::GetAString))
-        .WillExecute(FakeStringFunc2);
+        .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeStringFunc));
 
     BaseClassTest b;
 
     // Act
     std::string actual = b.GetAString();
+
+    // Assert
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionReturnUserDefinedClassWhenCalled)
+{
+    // Prepare
+    Address expected;
+    expected.SetAddressLine("fakeAddressLine");
+    expected.SetZipCode("fakeZipCode");
+
+    InjectorPP::Injector injector;
+
+    injector.WhenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::GetAnAddress))
+        .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeGetAnAddress));
+
+    BaseClassTest b;
+
+    // Act
+    Address actual = b.GetAnAddress();
 
     // Assert
     EXPECT_EQ(expected, actual);

@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <string>
 #include <vector>
+#include "ResolvedType.h"
 
 namespace InjectorPP
 {
@@ -22,7 +23,7 @@ namespace InjectorPP
         // Function.Name may be Address::GetMyCode, whereas 
         // Function.RawName is GetMyCode.
         std::string RawName;
-        std::string ReturnType;
+        ResolvedType ReturnType;
         std::vector<FunctionParameter> Parameters;
         ULONG64 Address;
     };

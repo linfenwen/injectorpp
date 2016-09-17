@@ -34,3 +34,12 @@ std::string* BaseClassTest::GetAStringPointer()
 
     return p;
 }
+
+Address BaseClassTest::GetAnAddress()
+{
+    Address addr;
+    addr.SetAddressLine("normalAddressLine");
+    addr.SetZipCode("normalZipCode");
+
+    return addr;
+}

@@ -51,6 +51,12 @@
     <ClInclude Include="include\Class.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\SymbolEnums.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResolvedType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FunctionResolver.cpp">

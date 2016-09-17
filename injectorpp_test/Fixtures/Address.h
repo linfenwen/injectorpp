@@ -7,36 +7,39 @@ using std::string;
 
 class Address
 {
-private:
-    static Address* singleton;
-
 public:
-    static Address* GetSingleton();
-    static void ClearSingleton();
-    static string* GetCapitalCityByCountry(string country);
+    Address()
+    {
+    };
 
-    Address() {};
-    int GetMyCode();
-    void SetCountry(string country);
-    string GetCountry();
-    void GetCountryByReference(string& country);
-    int GetZipCode();
-    char* GetCity();
-    void GetStreetName(string* street);
-    void SetStreetName(char* streetName);
-    void SetCountryOnSingleton(string country);
-    void CallSetCountryInternal(string country);
-    void CallOverloadedPrivate();
+    Address(const Address& rhs)
+    {
+        this->zipCode = rhs.zipCode;
+        this->addressLine = rhs.addressLine;
+    }
 
-    static char *GetZipCode(char *country, char *streetName);
+    Address& operator=(Address rhs)
+    {
+        this->zipCode = rhs.zipCode;
+        this->addressLine = rhs.addressLine;
+
+        return *this;
+    }
+
+    bool operator==(const Address& rhs) const
+    {
+        return this->zipCode == rhs.zipCode && this->addressLine == rhs.addressLine;
+    }
+
+    std::string GetZipCode();
+    void SetZipCode(const std::string& zipCode);
+
+    std::string GetAddressLine();
+    void SetAddressLine(const std::string& addressLine);
+
 private:
-    char* dumyCharArrayField;
-    int dummyIntField;
-
-    void SetCountryInternal(std::string country);
-    static void CountReference();
-    void OverloadedPrivate(int i);
-    void OverloadedPrivate(char *name);
+    std::string zipCode;
+    std::string addressLine;
 };
 
 #endif

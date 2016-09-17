@@ -136,6 +136,8 @@
     <ClInclude Include="include\IFunctionResolver.h" />
     <ClInclude Include="include\InjectorCore.h" />
     <ClInclude Include="include\Injector.h" />
+    <ClInclude Include="include\ResolvedType.h" />
+    <ClInclude Include="include\SymbolEnums.h" />
     <ClInclude Include="include\SymbolInfoHelper.h" />
     <ClInclude Include="include\Utility.h" />
   </ItemGroup>

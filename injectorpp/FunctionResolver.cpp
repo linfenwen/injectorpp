@@ -8,66 +8,6 @@
 
 namespace InjectorPP
 {
-    enum SymTagEnum
-    {
-        SymTagNull,
-        SymTagExe,
-        SymTagCompiland,
-        SymTagCompilandDetails,
-        SymTagCompilandEnv,
-        SymTagFunction,
-        SymTagBlock,
-        SymTagData,
-        SymTagAnnotation,
-        SymTagLabel,
-        SymTagPublicSymbol,
-        SymTagUDT,
-        SymTagEnum,
-        SymTagFunctionType,
-        SymTagPointerType,
-        SymTagArrayType,
-        SymTagBaseType,
-        SymTagTypedef,
-        SymTagBaseClass,
-        SymTagFriend,
-        SymTagFunctionArgType,
-        SymTagFuncDebugStart,
-        SymTagFuncDebugEnd,
-        SymTagUsingNamespace,
-        SymTagVTableShape,
-        SymTagVTable,
-        SymTagCustom,
-        SymTagThunk,
-        SymTagCustomType,
-        SymTagManagedType,
-        SymTagDimension,
-        SymTagCallSite,
-        SymTagMax
-    };
-
-    /* Extracted from cvconst.h */
-    enum BasicType
-    {
-        btNoType = 0,
-        btVoid = 1,
-        btChar = 2,
-        btWChar = 3,
-        btInt = 6,
-        btUInt = 7,
-        btFloat = 8,
-        btBCD = 9,
-        btBool = 10,
-        btLong = 13,
-        btULong = 14,
-        btCurrency = 25,
-        btDate = 26,
-        btVariant = 27,
-        btComplex = 28,
-        btBit = 29,
-        btBSTR = 30,
-        btHresult = 31,
-    };
-
     BOOL __stdcall EnumParamsCallback(PSYMBOL_INFO inf, ULONG size, PVOID param)
     {
         // Transform the param back to the one it was before.
@@ -109,7 +49,7 @@ namespace InjectorPP
     {
     }
 
-    std::string FunctionResolver::GetMethodReturnTypeFromAddress(const ULONG64& funcAddress)
+    ResolvedType FunctionResolver::GetMethodReturnTypeFromAddress(const ULONG64& funcAddress)
     {
         SymbolInfoHelper* pSymbolInfoHelper = new SymbolInfoHelper();
         //PSYMBOL_INFO symbol = pSymbolInfoHelper->AllocSymbol(256);
@@ -124,25 +64,27 @@ namespace InjectorPP
         symbol->SizeOfStruct = sizeof(*symbol);  //both values must
         symbol->MaxNameLen = array_size;           //be set by user
 
+        ResolvedType resolvedType;
+
         DWORD64  dwDisplacement = 0;
         if (SymFromAddr(this->m_hProcess, funcAddress, &dwDisplacement, symbol) == FALSE)
         {
-            return "";
+            return resolvedType;
         }
 
-        std::string returnType = this->ResolveReturnType(symbol->ModBase, symbol->TypeIndex);
+        resolvedType = this->ResolveReturnType(symbol->ModBase, symbol->TypeIndex);
 
         delete pSymbolInfoHelper;
         pSymbolInfoHelper = NULL;
 
-        return returnType;
+        return resolvedType;
     }
 
     std::string FunctionResolver::GetMethodSymbolFromAddress(const ULONG64& funcAddress)
     {
         SymbolInfoHelper* pSymbolInfoHelper = new SymbolInfoHelper();
         //PSYMBOL_INFO symbol = pSymbolInfoHelper->AllocSymbol(256);
-        
+
         const size_t array_size = 256;
         const size_t size = sizeof(SYMBOL_INFO) + (array_size - 1) * sizeof(TCHAR);
         SYMBOL_INFO* symbol = (SYMBOL_INFO*)calloc(1, size);
@@ -186,7 +128,7 @@ namespace InjectorPP
         }
 
         // Get function's return type.
-        std::string returnType = this->ResolveReturnType(modBase, typeIndex);
+        ResolvedType returnType = this->ResolveReturnType(modBase, typeIndex);
 
         // Get function's parameters.
         std::vector<FunctionParameter> parameters;
@@ -209,7 +151,7 @@ namespace InjectorPP
         resolvedFunction.Address = functionAddress;
     }
 
-    std::string FunctionResolver::ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex)
+    ResolvedType FunctionResolver::ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex)
     {
         // Let's resolve return type.
 
@@ -218,10 +160,10 @@ namespace InjectorPP
         SymGetTypeInfo(this->m_hProcess, modBase, typeIndex, TI_GET_TYPEID, &functionReturnTypeIndex);
 
         // We got the return type index, now resolve it as string.
-        std::string returnTypeString;
-        this->LoadType(modBase, functionReturnTypeIndex, returnTypeString);
+        ResolvedType returnType;
+        this->LoadType(modBase, functionReturnTypeIndex, returnType);
 
-        return returnTypeString;
+        return returnType;
     }
 
     void FunctionResolver::ResolveParameters(const ULONG64& functionAddress, const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters)
@@ -239,48 +181,48 @@ namespace InjectorPP
         SymEnumSymbols(this->m_hProcess, NULL, NULL, EnumParamsCallback, &resolvedParameters);
     }
 
-    void FunctionResolver::LoadBasicType(BasicType bt, ULONG64 byteSize, std::string& resolvedType)
+    void FunctionResolver::LoadBasicType(BasicType bt, ULONG64 byteSize, ResolvedType& resolvedType)
     {
         // To represent what kind of object we have i use a VARIANT which
         // can hold a lot of different types.
         switch (bt)
         {
         case btNoType:
-            resolvedType = "Unknown";
+            resolvedType.Name = "Unknown";
             m_value.vt = VT_UNKNOWN;
             break;
         case btVoid:
-            resolvedType = "void";
+            resolvedType.Name = "void";
             m_value.vt = VT_UNKNOWN; // void cannot be evaluated so we set it as VT_UNKNOWN
             break;
         case btChar:
             m_value.vt = VT_I1 | 0x1000; // its a 'special' 1 byte integer, so we add 0x1000
-            resolvedType = "char";
+            resolvedType.Name = "char";
             break;
         case btWChar:
             m_value.vt = VT_I1 | 0x8000; // its actually not a 1 byte integer, so we add 0x8000
-            resolvedType = "wchar_t";
+            resolvedType.Name = "wchar_t";
             break;
         case btInt:
         {
-            resolvedType = "signed __int32";
+            resolvedType.Name = "signed __int32";
             m_value.vt = VT_I4; // btInt is set for every type of integer. We need to determine the real type by the byte size
             switch (byteSize)
             {
             case sizeof(__int8) :
-                resolvedType = "signed __int8";
+                resolvedType.Name = "signed __int8";
                 m_value.vt = VT_I1;
                 break;
             case sizeof(__int16) :
-                resolvedType = "signed __int16";
+                resolvedType.Name = "signed __int16";
                 m_value.vt = VT_I2;
                 break;
             case sizeof(__int32) :
-                resolvedType = "signed __int32";
+                resolvedType.Name = "signed __int32";
                 m_value.vt = VT_I4;
                 break;
             case sizeof(__int64) :
-                resolvedType = "signed __int64";
+                resolvedType.Name = "signed __int64";
                 m_value.vt = VT_I8;
                 break;
             }
@@ -288,86 +230,86 @@ namespace InjectorPP
         }
         case btUInt:
         {
-            resolvedType = "unsigned __int32";
+            resolvedType.Name = "unsigned __int32";
             m_value.vt = VT_UI4;
             switch (byteSize)
             {
             case sizeof(__int8) :
-                resolvedType = "unsigned __int8";
+                resolvedType.Name = "unsigned __int8";
                 m_value.vt = VT_UI1;
                 break;
             case sizeof(__int16) :
-                resolvedType = "unsigned __int16";
+                resolvedType.Name = "unsigned __int16";
                 m_value.vt = VT_UI2;
                 break;
             case sizeof(__int32) :
-                resolvedType = "unsigned __int32";
+                resolvedType.Name = "unsigned __int32";
                 m_value.vt = VT_UI4;
                 break;
             case sizeof(__int64) :
-                resolvedType = "unsigned __int64";
+                resolvedType.Name = "unsigned __int64";
                 m_value.vt = VT_UI8;
                 break;
             }
             break;
         }
         case btFloat:
-            resolvedType = "float";
+            resolvedType.Name = "float";
             m_value.vt = VT_R4;
             break;
         case btBCD:
-            resolvedType = "BCD";
+            resolvedType.Name = "BCD";
             m_value.vt = VT_UNKNOWN;
             break;
         case btBool:
-            resolvedType = "bool";
+            resolvedType.Name = "bool";
             m_value.vt = VT_BOOL;
             break;
         case btLong:
-            resolvedType = "long int";
+            resolvedType.Name = "long int";
             m_value.vt = VT_I4;
             break;
         case btULong:
-            resolvedType = "unsigned long int";
+            resolvedType.Name = "unsigned long int";
             m_value.vt = VT_UI4;
             break;
         case btCurrency:
-            resolvedType = "currency";
+            resolvedType.Name = "currency";
             m_value.vt = VT_UNKNOWN;
             break;
         case btDate:
-            resolvedType = "DATE";
+            resolvedType.Name = "DATE";
             m_value.vt = VT_UNKNOWN;
             break;
         case btComplex:
-            resolvedType = "complex";
+            resolvedType.Name = "complex";
             m_value.vt = VT_UNKNOWN;
             break;
         case btVariant:
-            resolvedType = "VARIANT";
+            resolvedType.Name = "VARIANT";
             m_value.vt = VT_UNKNOWN;
             break;
         case btBit:
-            resolvedType = "bit";
+            resolvedType.Name = "bit";
             m_value.vt = VT_UNKNOWN;
             break;
         case btBSTR:
-            resolvedType = "OLESTR";
+            resolvedType.Name = "OLESTR";
             m_value.vt = VT_BSTR;
             break;
         case btHresult:
-            resolvedType = "HRESULT";
+            resolvedType.Name = "HRESULT";
             m_value.vt = VT_BLOB;
             break;
 
         default:
-            resolvedType = "Unknown";
+            resolvedType.Name = "Unknown";
             m_value.vt = VT_UNKNOWN;
             break;
         }
     }
 
-    void FunctionResolver::LoadType(ULONG64 modBase, ULONG typeIndex, std::string& resolvedType)
+    void FunctionResolver::LoadType(ULONG64 modBase, ULONG typeIndex, ResolvedType& resolvedType)
     {
         // Sadly loading the actual name of the type must be done in several different
         // ways for different types. To see which one we need to follow we first take
@@ -396,6 +338,8 @@ namespace InjectorPP
             SymGetTypeInfo(m_hProcess, modBase, typeIndex, TI_GET_BASETYPE, &bt);
             ULONG64 length = 0;
             SymGetTypeInfo(m_hProcess, modBase, typeIndex, TI_GET_LENGTH, &length);
+
+            resolvedType.SymbolTag = SymTagBaseType;
             LoadBasicType(bt, length, resolvedType);
 
             return;
@@ -406,6 +350,8 @@ namespace InjectorPP
         {
             ULONG subType;
             SymGetTypeInfo(m_hProcess, modBase, typeIndex, TI_GET_TYPE, &subType);
+
+            resolvedType.SymbolTag = SymTagPointerType;
             LoadPointerType(modBase, typeIndex, subType, resolvedType);
             // We need to override the possible type set by LoadPointerType because it should
             // only take an address when we evaluate it.
@@ -425,7 +371,8 @@ namespace InjectorPP
             {
                 std::vector<char> ansi(wcslen(symName) + 1);
                 WideCharToMultiByte(CP_ACP, 0, symName, ansi.size(), &ansi[0], ansi.size(), NULL, NULL);
-                resolvedType = &ansi[0];
+                resolvedType.Name = &ansi[0];
+                resolvedType.SymbolTag = tag;
                 LocalFree(symName);
             }
             break;
@@ -433,7 +380,7 @@ namespace InjectorPP
         }
     }
 
-    void FunctionResolver::LoadPointerType(ULONG64 modBase, ULONG typeIndex, ULONG type, std::string& resolvedType)
+    void FunctionResolver::LoadPointerType(ULONG64 modBase, ULONG typeIndex, ULONG type, ResolvedType& resolvedType)
     {
         // This function does exactly the same as LoadType does except
         // that it adds a * to the type name
@@ -448,7 +395,8 @@ namespace InjectorPP
             ULONG64 length = 0;
             SymGetTypeInfo(m_hProcess, modBase, type, TI_GET_LENGTH, &length);
             LoadBasicType(bt, length, resolvedType);
-            resolvedType += '*';
+            resolvedType.Name += '*';
+
             return;
         }
         case SymTagPointerType:
@@ -458,7 +406,7 @@ namespace InjectorPP
             // We recursively call ourselfs until we dont have a PointerType anymore
             // for example in char*** we need to call it 3 times
             LoadPointerType(modBase, typeIndex, subType, resolvedType);
-            resolvedType += '*';
+            resolvedType.Name += '*';
 
             return;
         }
@@ -477,8 +425,9 @@ namespace InjectorPP
             {
                 std::vector<char> ansi(wcslen(symName) + 1);
                 WideCharToMultiByte(CP_ACP, 0, symName, ansi.size(), &ansi[0], ansi.size(), NULL, NULL);
-                resolvedType = &ansi[0];
-                resolvedType += '*';
+                resolvedType.Name = &ansi[0];
+                resolvedType.Name += '*';
+
                 LocalFree(symName);
             }
             break;

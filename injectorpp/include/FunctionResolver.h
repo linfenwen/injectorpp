@@ -20,11 +20,11 @@ namespace InjectorPP
 
         virtual std::string GetMethodSymbolFromAddress(const ULONG64& funcAddress);
 
-        virtual std::string GetMethodReturnTypeFromAddress(const ULONG64& funcAddress);
+        virtual ResolvedType GetMethodReturnTypeFromAddress(const ULONG64& funcAddress);
 
     protected:
         // Resolve the function return type.
-        virtual std::string ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex);
+        virtual ResolvedType ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex);
 
         virtual void ResolveParameters(const ULONG64& functionAddress, const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters);
     private:
@@ -32,13 +32,13 @@ namespace InjectorPP
         FunctionResolver(const FunctionResolver&);
 
         // Loads the name of the type of that symbol
-        void LoadType(ULONG64 modBase, ULONG typeIndex, std::string& resolvedType);
+        void LoadType(ULONG64 modBase, ULONG typeIndex, ResolvedType& resolvedType);
 
         // Loads a basic type (int, float, char, ...)
-        void LoadBasicType(BasicType bt, ULONG64 byteSize, std::string& resolvedType);
+        void LoadBasicType(BasicType bt, ULONG64 byteSize, ResolvedType& resolvedType);
 
         // Loads the type pointed to
-        void LoadPointerType(ULONG64 modBase, ULONG typeIndex, ULONG subType, std::string& resolvedType);
+        void LoadPointerType(ULONG64 modBase, ULONG typeIndex, ULONG subType, ResolvedType& resolvedType);
 
         VARIANT m_value;
         std::string m_objName;

@@ -5,107 +5,23 @@
 
 using std::string;
 
-Address* Address::singleton = NULL;
-
-void Address::SetCountry(string country)
+std::string Address::GetZipCode()
 {
-    throw;
+    return this->zipCode;
 }
 
-string Address::GetCountry()
+void Address::SetZipCode(const std::string& zipCode)
 {
-    throw;
+    this->zipCode = zipCode;
 }
 
-void Address::GetCountryByReference(string& country)
+std::string Address::GetAddressLine()
 {
-    throw;
+    return this->addressLine;
 }
 
-
-int Address::GetZipCode()
+void Address::SetAddressLine(const std::string& addressLine)
 {
-    return -1;
+    this->addressLine = addressLine;
 }
-
-char* Address::GetCity()
-{
-    throw;
-}
-
-Address* Address::GetSingleton()
-{
-    if (singleton == NULL)
-        singleton = new Address();
-    return singleton;
-}
-
-void Address::ClearSingleton()
-{
-    CountReference();
-    if (singleton != NULL)
-    {
-        delete singleton;
-        singleton = NULL;
-    }
-}
-
-string* Address::GetCapitalCityByCountry(string country)
-{
-    throw;
-}
-
-void Address::SetStreetName(char* streetName)
-{
-    throw;
-}
-
-void Address::GetStreetName(string* street)
-{
-    *street = "";
-}
-
-void Address::SetCountryOnSingleton(string country)
-{
-    Address::GetSingleton()->SetCountryInternal(country);
-}
-
-void Address::CallSetCountryInternal(string country)
-{
-    SetCountryInternal(country);
-}
-
-void Address::SetCountryInternal(std::string country)
-{
-    // do something here
-}
-void Address::CallOverloadedPrivate()
-{
-    OverloadedPrivate(1);
-}
-
-void Address::OverloadedPrivate(int i)
-{
-    // do something here
-}
-void Address::OverloadedPrivate(char *name)
-{
-    // do something here
-}
-
-void Address::CountReference()
-{
-    throw;
-}
-
-char* Address::GetZipCode(char *country, char *streetName)
-{
-    throw;
-}
-
-int Address::GetMyCode()
-{
-    return -2;
-}
-
 

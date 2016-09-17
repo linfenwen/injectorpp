@@ -26,24 +26,12 @@ namespace InjectorPP
 
         void* GetVirtualMethodAddress(void* classInstance, const std::string& virtualMethodName);
 
-        std::string GetMethodReturnType(void* srcFunc);
-
         void ReplaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction);
-
-        void* Fake(const char* typeName, size_t typeSize, bool autoFillDefaultValue);
-
-        void ChangeFunctionReturnValue(const std::string& funcCallCode, const int& expectedReturnValue);
-
-        void ChangeFunctionReturnValue(const std::string& funcCallCode, const char* expectedReturnValue);
-
-        void ChangeFunctionReturnValue(const std::string& funcCallCode, const void* expectedReturnValue);
 
     private:
         InjectorCore(const InjectorCore&);
 
         void RecoverAllReplacedFunctions();
-
-        void GetFunctionAddressByFunctionCallCode(const std::string& funcCallCode, ULONG64& funcAddress);
 
         bool SaveOriginalFuncASM(OriginalFuncASM* originalFuncASM);
 
