@@ -74,6 +74,44 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
 
 ```
 
+### Mock static methods
+Injector++ supports static method mocking. Below is a simple example:
+
+```cpp
+
+Address FakeGetAnAddress()
+{
+    Address addr;
+    addr.SetAddressLine("fakeAddressLine");
+    addr.SetZipCode("fakeZipCode");
+
+    return addr;
+}
+
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefinedClassWhenCalled)
+{
+    // Prepare
+    Address expected;
+    expected.SetAddressLine("fakeAddressLine");
+    expected.SetZipCode("fakeZipCode");
+
+    InjectorPP::Injector injector;
+
+    injector.WhenCalled(INJECTORPP_STATIC_MEMBER_FUNCTION(BaseClassTest::GetAnAddressStatic))
+        .WillExecute(FakeGetAnAddress);
+
+    BaseClassTest b;
+
+    // Act
+	// FakeGetAnAddress will be executed!
+    Address actual = b.GetAnAddressStatic();
+
+    // Assert
+    EXPECT_EQ(expected, actual);
+}
+
+```
+
 ## Prerequisites
 1. Injector++ only supports Windows by now. Linux support will be added soon.
 2. Injector++ needs to retrieve information from pdb, therefore please:

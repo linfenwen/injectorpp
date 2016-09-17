@@ -22,6 +22,8 @@ public:
     std::string* GetAStringPointer();
 
     Address GetAnAddress();
+
+    static Address GetAnAddressStatic();
 };
 
 #endif

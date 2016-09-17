@@ -126,10 +126,10 @@ namespace InjectorPP
         return result;
     }
 
-    void InjectorCore::ReplaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction)
+    void InjectorCore::ReplaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction, bool isSourceStaticMemberFunction)
     {
         bool isComplexReturn = false;
-        if (isSourceMemberFunction)
+        if (isSourceMemberFunction && !isSourceStaticMemberFunction)
         {
             ResolvedType returnType = this->m_functionResolver->GetMethodReturnTypeFromAddress((ULONG64)srcFunc);
             if (returnType.SymbolTag != SymTagEnum::SymTagBaseType

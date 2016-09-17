@@ -12,6 +12,7 @@ namespace InjectorPP
     {
         void* functionAddress;
         bool isMemberFunction;
+        bool isStaticMemberFunction;
     };
 
     class Injector
@@ -43,11 +44,12 @@ namespace InjectorPP
             }
         }
 
-        Injector& WhenCalled(void* srcMockFunc, bool isMemberFunction = false)
+        Injector& WhenCalled(void* srcMockFunc, bool isMemberFunction = false, bool isStaticMemberFunction = false)
         {
             FunctionWrapper* functionWrapper = new FunctionWrapper();
             functionWrapper->functionAddress = srcMockFunc;
             functionWrapper->isMemberFunction = isMemberFunction;
+            functionWrapper->isStaticMemberFunction = isStaticMemberFunction;
             this->m_whenCalledFunc.push(functionWrapper);
             return *this;
         }
@@ -59,13 +61,14 @@ namespace InjectorPP
             FunctionWrapper* functionWrapper = new FunctionWrapper();
             functionWrapper->functionAddress = virtualFunction;
             functionWrapper->isMemberFunction = true;
+            functionWrapper->isStaticMemberFunction = false;
 
             this->m_whenCalledFunc.push(functionWrapper);
 
             return *this;
         }
 
-        Injector& WillExecute(void* destMockFunc, bool isMemberFunction = false)
+        Injector& WillExecute(void* destMockFunc, bool isMemberFunction = false, bool isStaticMemberFunction = false)
         {
             if (this->m_whenCalledFunc.empty())
             {
@@ -80,58 +83,16 @@ namespace InjectorPP
             FunctionWrapper* srcFunctionWrapper = this->m_whenCalledFunc.top();
             this->m_whenCalledFunc.pop();
 
-            this->m_injectorCore->ReplaceFunction(srcFunctionWrapper->functionAddress, destMockFunc, srcFunctionWrapper->isMemberFunction);
+            this->m_injectorCore->ReplaceFunction(srcFunctionWrapper->functionAddress,
+                destMockFunc,
+                srcFunctionWrapper->isMemberFunction,
+                srcFunctionWrapper->isStaticMemberFunction);
 
             delete srcFunctionWrapper;
             srcFunctionWrapper = NULL;
 
             return *this;
         }
-
-        template <typename T>
-        T* Fake(bool autoFillDefaultValue = true)
-        {
-            return static_cast<T*>(this->m_injectorCore->Fake(typeid(T).name(), sizeof(T), autoFillDefaultValue));
-        }
-
-        /*void Return(int expectedReturnValue)
-        {
-            if (this->m_whenCalledFuncCode.empty())
-            {
-                throw;
-            }
-
-            std::string funcCallCode = this->m_whenCalledFuncCode.top();
-            this->m_whenCalledFuncCode.pop();
-
-            this->m_injectorCore->ChangeFunctionReturnValue(funcCallCode, expectedReturnValue);
-        }
-
-        void Return(char* expectedReturnValue)
-        {
-            if (this->m_whenCalledFuncCode.empty())
-            {
-                throw;
-            }
-
-            std::string funcCallCode = this->m_whenCalledFuncCode.top();
-            this->m_whenCalledFuncCode.pop();
-
-            this->m_injectorCore->ChangeFunctionReturnValue(funcCallCode, expectedReturnValue);
-        }
-
-        void Return(void* expectedReturnValue)
-        {
-            if (this->m_whenCalledFuncCode.empty())
-            {
-                throw;
-            }
-
-            std::string funcCallCode = this->m_whenCalledFuncCode.top();
-            this->m_whenCalledFuncCode.pop();
-
-            this->m_injectorCore->ChangeFunctionReturnValue(funcCallCode, expectedReturnValue);
-        }*/
 
         template<typename OUTTYPE, typename INTYPE>
         static OUTTYPE ForceCast(INTYPE in)
@@ -157,7 +118,10 @@ namespace InjectorPP
     };
 
 #define INJECTORPP_MEMBER_FUNCTION(fullyQualifiedFunctionName) \
-InjectorPP::Injector::ForceCast<void*>(&fullyQualifiedFunctionName), true
+InjectorPP::Injector::ForceCast<void*>(&fullyQualifiedFunctionName), true, false
+
+#define INJECTORPP_STATIC_MEMBER_FUNCTION(fullyQualifiedFunctionName) \
+InjectorPP::Injector::ForceCast<void*>(&fullyQualifiedFunctionName), true, true
 }
 
 #endif

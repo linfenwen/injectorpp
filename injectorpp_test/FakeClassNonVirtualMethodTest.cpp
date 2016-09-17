@@ -147,3 +147,24 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionReturnUserDefinedClassW
     EXPECT_EQ(expected, actual);
 }
 
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefinedClassWhenCalled)
+{
+    // Prepare
+    Address expected;
+    expected.SetAddressLine("fakeAddressLine");
+    expected.SetZipCode("fakeZipCode");
+
+    InjectorPP::Injector injector;
+
+    injector.WhenCalled(INJECTORPP_STATIC_MEMBER_FUNCTION(BaseClassTest::GetAnAddressStatic))
+        .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeGetAnAddress));
+
+    BaseClassTest b;
+
+    // Act
+    Address actual = b.GetAnAddressStatic();
+
+    // Assert
+    EXPECT_EQ(expected, actual);
+}
+

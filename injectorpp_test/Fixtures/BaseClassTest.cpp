@@ -43,3 +43,12 @@ Address BaseClassTest::GetAnAddress()
 
     return addr;
 }
+
+Address BaseClassTest::GetAnAddressStatic()
+{
+    Address addr;
+    addr.SetAddressLine("normalAddressLine");
+    addr.SetZipCode("normalZipCode");
+
+    return addr;
+}
