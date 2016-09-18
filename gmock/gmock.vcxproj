@@ -19,13 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E007552C-DD22-4BA8-B8A2-18B1A2C3A0AC}</ProjectGuid>
-    <RootNamespace>injectorpp_test</RootNamespace>
+    <ProjectGuid>{404C700F-5801-4571-8398-FE23FD85A851}</ProjectGuid>
+    <RootNamespace>gmock</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -38,7 +38,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -68,37 +68,24 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\gmock\googlemock\include;$(ProjectDir)..\gmock\googletest\include;$(ProjectDir)..\injectorpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>googlemock\include;googlemock;googletest\include;googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\gmock.lib;$(SolutionDir)$(Configuration)\injectorpp.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\gmock\googlemock\include;$(ProjectDir)..\gmock\googletest\include;$(ProjectDir)..\injectorpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>googlemock\include;googlemock;googletest\include;googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\gmock.lib;$(SolutionDir)$(Platform)\$(Configuration)\injectorpp.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -127,17 +114,51 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FakeClassNonVirtualMethodTest.cpp" />
-    <ClCompile Include="FakeClassVirtualMethodTest.cpp" />
-    <ClCompile Include="Fixtures\Address.cpp" />
-    <ClCompile Include="Fixtures\BaseClassTest.cpp" />
-    <ClCompile Include="Fixtures\SubClassTest.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <ClInclude Include="googlemock\include\gmock\gmock-actions.h" />
+    <ClInclude Include="googlemock\include\gmock\gmock-cardinalities.h" />
+    <ClInclude Include="googlemock\include\gmock\gmock-generated-actions.h" />
+    <ClInclude Include="googlemock\include\gmock\gmock-generated-function-mockers.h" />
+    <ClInclude Include="googlemock\include\gmock\gmock-generated-matchers.h" />
+    <ClInclude Include="googlemock\include\gmock\gmock-generated-nice-strict.h" />
+    <ClInclude Include="googlemock\include\gmock\gmock-matchers.h" />
+    <ClInclude Include="googlemock\include\gmock\gmock-more-actions.h" />
+    <ClInclude Include="googlemock\include\gmock\gmock-more-matchers.h" />
+    <ClInclude Include="googlemock\include\gmock\gmock-spec-builders.h" />
+    <ClInclude Include="googlemock\include\gmock\gmock.h" />
+    <ClInclude Include="googlemock\include\gmock\internal\custom\gmock-generated-actions.h" />
+    <ClInclude Include="googlemock\include\gmock\internal\custom\gmock-matchers.h" />
+    <ClInclude Include="googlemock\include\gmock\internal\custom\gmock-port.h" />
+    <ClInclude Include="googlemock\include\gmock\internal\gmock-generated-internal-utils.h" />
+    <ClInclude Include="googlemock\include\gmock\internal\gmock-internal-utils.h" />
+    <ClInclude Include="googlemock\include\gmock\internal\gmock-port.h" />
+    <ClInclude Include="googletest\include\gtest\gtest-death-test.h" />
+    <ClInclude Include="googletest\include\gtest\gtest-message.h" />
+    <ClInclude Include="googletest\include\gtest\gtest-param-test.h" />
+    <ClInclude Include="googletest\include\gtest\gtest-printers.h" />
+    <ClInclude Include="googletest\include\gtest\gtest-spi.h" />
+    <ClInclude Include="googletest\include\gtest\gtest-test-part.h" />
+    <ClInclude Include="googletest\include\gtest\gtest-typed-test.h" />
+    <ClInclude Include="googletest\include\gtest\gtest.h" />
+    <ClInclude Include="googletest\include\gtest\gtest_pred_impl.h" />
+    <ClInclude Include="googletest\include\gtest\gtest_prod.h" />
+    <ClInclude Include="googletest\include\gtest\internal\custom\gtest-port.h" />
+    <ClInclude Include="googletest\include\gtest\internal\custom\gtest-printers.h" />
+    <ClInclude Include="googletest\include\gtest\internal\custom\gtest.h" />
+    <ClInclude Include="googletest\include\gtest\internal\gtest-death-test-internal.h" />
+    <ClInclude Include="googletest\include\gtest\internal\gtest-filepath.h" />
+    <ClInclude Include="googletest\include\gtest\internal\gtest-internal.h" />
+    <ClInclude Include="googletest\include\gtest\internal\gtest-linked_ptr.h" />
+    <ClInclude Include="googletest\include\gtest\internal\gtest-param-util-generated.h" />
+    <ClInclude Include="googletest\include\gtest\internal\gtest-param-util.h" />
+    <ClInclude Include="googletest\include\gtest\internal\gtest-port-arch.h" />
+    <ClInclude Include="googletest\include\gtest\internal\gtest-port.h" />
+    <ClInclude Include="googletest\include\gtest\internal\gtest-string.h" />
+    <ClInclude Include="googletest\include\gtest\internal\gtest-tuple.h" />
+    <ClInclude Include="googletest\include\gtest\internal\gtest-type-util.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Fixtures\Address.h" />
-    <ClInclude Include="Fixtures\BaseClassTest.h" />
-    <ClInclude Include="Fixtures\SubClassTest.h" />
+    <ClCompile Include="googlemock\src\gmock-all.cc" />
+    <ClCompile Include="googletest\src\gtest-all.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
