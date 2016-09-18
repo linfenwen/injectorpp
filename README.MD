@@ -120,14 +120,18 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefined
 
 > Project property dialog -> Linker -> General -> Enable Incremental Linking -> *No (/INCREMENTAL:NO)*.
 
+## Known issue
+1. Does not support x64 platform.
+
 ## Roadmap
 There's a headache of C++ unit testing - No way to abstract the legacy code. As there's no reflection in C++, it is not that easy to change the behavior of non-virtual and static methods, which makes C++ unit testing extremely hard.
 
 Injector++ intends to resolve the headache. It's goal is to make static method, non-virtual method and global functions testable without changing your production code. To accomplish this we still have to:
 
-1. Add rich mock helper functions (e.g, return value expectation, input parameter mock, exception expectation...).
-2. Add Linux support.
-3. Adapt to mainstream unit test runners.
+1. Add x64 platform support.
+2. Add rich mock helper functions (e.g, return value expectation, input parameter mock, exception expectation...).
+3. Add Linux support.
+4. Adapt to mainstream unit test runners.
 
 ## Contribute
 Welcome to help Injector++. You can submit bugs, suggestions and feature requests to the issue tracker, or send me pull request. Happy coding & testing!
