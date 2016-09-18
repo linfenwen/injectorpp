@@ -27,9 +27,6 @@
     <ClInclude Include="include\Utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\FakeFunctions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\BehaviorChanger.h">
       <Filter>Header Files</Filter>
     </ClInclude>

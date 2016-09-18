@@ -129,7 +129,6 @@
     <ClInclude Include="include\BehaviorChanger.h" />
     <ClInclude Include="include\Class.h" />
     <ClInclude Include="include\ClassResolver.h" />
-    <ClInclude Include="include\FakeFunctions.h" />
     <ClInclude Include="include\Function.h" />
     <ClInclude Include="include\FunctionResolver.h" />
     <ClInclude Include="include\IClassResolver.h" />

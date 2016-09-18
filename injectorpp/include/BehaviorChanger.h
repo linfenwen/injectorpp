@@ -31,28 +31,17 @@ namespace InjectorPP
     {
     public:
         BehaviorChanger();
-        ~BehaviorChanger();
+        virtual ~BehaviorChanger();
 
         // A magic function to change the function behavior at runtime
-        //
-        // funcAddress - The address of the function to be changed from.
-        // expectedReturnValue - The return value should be changed to.
-        void ChangeFunctionReturnValue(ULONG64 funcAddress, const int& expectedReturnValue, OriginalFuncASM* originalFuncAsm);
+        virtual void ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, bool isComplexReturn, bool isSourceFuncVirtualMethod);
 
-        void ChangeFunctionReturnValue(ULONG64 funcAddress, const char* expectedReturnValue, OriginalFuncASM* originalFuncAsm);
-
-        void ChangeFunctionReturnValue(ULONG64 funcAddress, const void* expectedReturnValue, OriginalFuncASM* originalFuncAsm);
-
-        void ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, bool isComplexReturn, bool isSourceFuncVirtualMethod);
-
-        void DirectWriteToFunction(ULONG64 funcAddress, const byte* asmCode, size_t asmCodeSize);
+        virtual void DirectWriteToFunction(ULONG64 funcAddress, const byte* asmCode, size_t asmCodeSize);
     private:
         BehaviorChanger(const BehaviorChanger&);
 
         std::vector<char*> m_allocatedCharBuff;
         std::vector<ULONG> m_allocatedCharBuffAddress;
-
-        static const int MAX_CHAR_BUFF_SIZE = 1024 * 1024;
     };
 }
 
