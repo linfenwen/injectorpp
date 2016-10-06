@@ -54,6 +54,18 @@
     <ClInclude Include="include\ResolvedType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\X86WindowsBehaviorChanger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OriginalFuncASM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BehaviorChangerFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\X64WindowsBehaviorChanger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FunctionResolver.cpp">
@@ -72,6 +84,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SymbolInfoHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\BehaviorChangerFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="X86WindowsBehaviorChanger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="X64WindowsBehaviorChanger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

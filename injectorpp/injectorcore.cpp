@@ -5,6 +5,7 @@
 #include "ClassResolver.h"
 #include "FunctionResolver.h"
 #include "Utility.h"
+#include "BehaviorChangerFactory.h"
 
 namespace InjectorPP
 {
@@ -18,7 +19,7 @@ namespace InjectorPP
         m_currentProcessHandler(NULL)
     {
         this->m_currentProcessHandler = GetCurrentProcess();
-        this->m_behaviorChanger = new BehaviorChanger();
+        this->m_behaviorChanger = BehaviorChangerFactory::Create();
         this->m_functionResolver = new FunctionResolver(this->m_currentProcessHandler);
         this->m_classResolver = new ClassResolver(this->m_currentProcessHandler, this->m_functionResolver);
         this->m_symbolInfoHelper = new SymbolInfoHelper();

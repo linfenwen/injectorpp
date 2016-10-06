@@ -127,6 +127,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\BehaviorChanger.h" />
+    <ClInclude Include="include\BehaviorChangerFactory.h" />
     <ClInclude Include="include\Class.h" />
     <ClInclude Include="include\ClassResolver.h" />
     <ClInclude Include="include\Function.h" />
@@ -135,15 +136,21 @@
     <ClInclude Include="include\IFunctionResolver.h" />
     <ClInclude Include="include\InjectorCore.h" />
     <ClInclude Include="include\Injector.h" />
+    <ClInclude Include="include\OriginalFuncASM.h" />
     <ClInclude Include="include\ResolvedType.h" />
     <ClInclude Include="include\SymbolEnums.h" />
     <ClInclude Include="include\SymbolInfoHelper.h" />
     <ClInclude Include="include\Utility.h" />
+    <ClInclude Include="include\X64WindowsBehaviorChanger.h" />
+    <ClInclude Include="include\X86WindowsBehaviorChanger.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BehaviorChanger.cpp" />
     <ClCompile Include="ClassResolver.cpp" />
     <ClCompile Include="FunctionResolver.cpp" />
+    <ClCompile Include="include\BehaviorChangerFactory.cpp" />
+    <ClCompile Include="X64WindowsBehaviorChanger.cpp" />
+    <ClCompile Include="X86WindowsBehaviorChanger.cpp" />
     <ClCompile Include="InjectorCore.cpp" />
     <ClCompile Include="SymbolInfoHelper.cpp" />
     <ClCompile Include="Utility.cpp" />
