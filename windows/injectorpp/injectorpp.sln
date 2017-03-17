@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "injectorpp_test", "..\injec
 		{8F80038C-C13B-4649-B191-410DF0361B40} = {8F80038C-C13B-4649-B191-410DF0361B40}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmock", "..\gmock\gmock.vcxproj", "{404C700F-5801-4571-8398-FE23FD85A851}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmock", "..\..\gmock\gmock.vcxproj", "{404C700F-5801-4571-8398-FE23FD85A851}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
