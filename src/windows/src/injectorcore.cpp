@@ -1,7 +1,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "InjectorCore.h"
+#include "injectorcore.h"
 #include "ClassResolver.h"
 #include "FunctionResolver.h"
 #include "Utility.h"
