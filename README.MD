@@ -1,13 +1,15 @@
 # Injector++
 
-Injector++ is a library to help you fake virtual/non-virtual methods, static methods and global functions without changing existing code.
+[![Build status](https://ci.appveyor.com/api/projects/status/gd9380fs0wnnx05e?svg=true)](https://ci.appveyor.com/project/mazong1123/injectorpp)
+
+Injector++ is a library to help you fake virtual/non-virtual methods, static methods and global functions **WITHOUT** changing existing code.
 
 ## How to use
 It's extremely easy to mock class methods via Injector++.
 
 ### Mock non-virtual methods
 
-Below example mocks BaseClassTest::GetAnInteger() by using FakeFunc():
+Below example fakes BaseClassTest::GetAnInteger() by using FakeFunc():
 
 ```cpp
 
@@ -32,7 +34,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeIntFunctionWhenCalled)
     BaseClassTest b = BaseClassTest();
 
     // Act
-	// FakeFunc will be executed!
+    // FakeFunc will be executed!
     int actual = b.GetAnInteger();
 
     // Assert
@@ -62,7 +64,7 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
         .WillExecute(FakeIntFuncForDerived);
 
     // Act
-	// FakeIntFuncForDerived() will be exectued!
+    // FakeIntFuncForDerived() will be exectued!
     int actual = derived->GetAnIntegerVirtual();
 
     // Assert
@@ -101,7 +103,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefined
         .WillExecute(FakeGetAnAddress);
 
     // Act
-	// FakeGetAnAddress will be executed!
+    // FakeGetAnAddress will be executed!
     Address actual = BaseClassTest::GetAnAddressStatic();
 
     // Assert
@@ -111,22 +113,24 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefined
 ```
 
 ## Prerequisites
-1. Injector++ only supports Windows by now. Linux support will be added soon.
-2. Injector++ needs to retrieve information from pdb, therefore please:
 
-> In Visual Studio, open project property dialog, select Configuration Properties -> Linker -> Debuggin, change Generate Debug Info to "true"
+### Windows
+- Injector++ only supports x86 Windows by now.
+- Injector++ needs to retrieve information from pdb, therefore please:
+- In Visual Studio, open project property dialog, select Configuration Properties -> Linker -> Debuggin, change Generate Debug Info to `Debug`.
+- Add `dbgHelp.lib` as dependency in your test project setting.
+- Project property dialog -> Linker -> General -> Enable Incremental Linking -> `No (/INCREMENTAL:NO)`.
 
-> Add dbgHelp.lib as dependency in your test project setting.
+### Linux
+In progress.
 
-> Project property dialog -> Linker -> General -> Enable Incremental Linking -> *No (/INCREMENTAL:NO)*.
-
-## Known issue
-1. Does not support x64 platform.
+### Mac OS
+In progress.
 
 ## Roadmap
 There's a headache of C++ unit testing - No way to abstract the legacy code. As there's no reflection in C++, it is not that easy to change the behavior of non-virtual and static methods, which makes C++ unit testing extremely hard.
 
-Injector++ intends to resolve the headache. It's goal is to make static method, non-virtual method and global functions testable without changing your production code. To accomplish this we still have to:
+Injector++ intends to resolve the headache. Its goal is to make static method, non-virtual method and global functions testable without changing your production code. To accomplish this we still have to:
 
 1. Add x64 platform support.
 2. Add rich mock helper functions (e.g, return value expectation, input parameter mock, exception expectation...).
