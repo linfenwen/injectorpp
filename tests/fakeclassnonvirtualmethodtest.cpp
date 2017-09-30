@@ -1,7 +1,7 @@
 #include "gmock/gmock.h"
-#include "Injector.h"
-#include "Fixtures/BaseClassTest.h"
-#include "Fixtures/SubClassTest.h"
+//#include "Injector.h"
+//#include "fixtures/BaseClassTest.h"
+//#include "fixtures/SubClassTest.h"
 #include <string>
 
 class FakeClassNonVirtualMethodTestFixture : public ::testing::Test
@@ -24,14 +24,14 @@ public:
         return p;
     }
 
-    Address FakeGetAnAddress()
+    /*Address FakeGetAnAddress()
     {
         Address addr;
         addr.SetAddressLine("fakeAddressLine");
         addr.SetZipCode("fakeZipCode");
 
         return addr;
-    }
+    }*/
 
 protected:
     virtual void SetUp()
@@ -43,7 +43,7 @@ protected:
     }
 };
 
-std::string FooReturnString()
+/*std::string FooReturnString()
 {
     return "FooReturnString";
 }
@@ -164,5 +164,5 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefined
 
     // Assert
     EXPECT_EQ(expected, actual);
-}
+}*/
 
