@@ -135,7 +135,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
 }
 
 
-/*TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionReturnUserDefinedClassWhenCalled)
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionReturnUserDefinedClassWhenCalled)
 {
     // Prepare
     Address expected;
@@ -156,7 +156,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefinedClassWhenCalled)
+/*TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefinedClassWhenCalled)
 {
     // Prepare
     Address expected;
