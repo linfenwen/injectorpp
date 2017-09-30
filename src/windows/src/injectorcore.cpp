@@ -156,7 +156,7 @@ namespace InjectorPP
 		{
 			if (isSourceStaticMemberFunction)
 			{
-				functionType = 4;
+				functionType = 3;
 			}
 			else
 			{
