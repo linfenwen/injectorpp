@@ -3,8 +3,8 @@
 
 #include <Windows.h>
 #include <string>
-#include "Function.h"
-#include "ResolvedType.h"
+#include "function.h"
+#include "resolvedtype.h"
 
 namespace InjectorPP
 {

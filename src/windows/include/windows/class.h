@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "Function.h"
+#include "function.h"
 
 namespace InjectorPP
 {

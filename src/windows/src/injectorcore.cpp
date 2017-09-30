@@ -1,11 +1,11 @@
 #include <vector>
 #include <algorithm>
 
-#include "injectorcore.h"
-#include "ClassResolver.h"
-#include "FunctionResolver.h"
-#include "Utility.h"
-#include "BehaviorChangerFactory.h"
+#include "windows/injectorcore.h"
+#include "windows/classresolver.h"
+#include "windows/functionresolver.h"
+#include "windows/utility.h"
+#include "windows/behaviorchangerfactory.h"
 
 namespace InjectorPP
 {

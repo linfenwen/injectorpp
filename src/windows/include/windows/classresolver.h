@@ -1,10 +1,10 @@
 #ifndef INJECTORPP_CLASSRESOLVER_H
 #define INJECTORPP_CLASSRESOLVER_H
 
-#include "Utility.h"
-#include "IClassResolver.h"
-#include "SymbolInfoHelper.h"
-#include "IFunctionResolver.h"
+#include "utility.h"
+#include "iclassresolver.h"
+#include "symbolinfohelper.h"
+#include "ifunctionresolver.h"
 
 namespace InjectorPP
 {

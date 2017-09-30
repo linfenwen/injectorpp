@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <sstream>
 
-#include "Utility.h"
+#include "windows/utility.h"
 
 namespace InjectorPP
 {

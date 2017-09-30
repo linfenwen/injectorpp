@@ -1,7 +1,7 @@
 #include <vector>
 #include <stdexcept>
 
-#include "X64WindowsBehaviorChanger.h"
+#include "windows/x64windowsbehaviorchanger.h"
 
 using std::vector;
 

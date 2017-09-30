@@ -4,7 +4,7 @@
 #include <Windows.h>
 #include <string>
 #include <vector>
-#include "ResolvedType.h"
+#include "resolvedtype.h"
 
 namespace InjectorPP
 {

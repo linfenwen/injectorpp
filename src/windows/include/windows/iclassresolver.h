@@ -2,7 +2,7 @@
 #define INJECTORPP_ICLASSRESOLVER_H
 
 #include <Windows.h>
-#include "Function.h"
+#include "function.h"
 
 namespace InjectorPP
 {

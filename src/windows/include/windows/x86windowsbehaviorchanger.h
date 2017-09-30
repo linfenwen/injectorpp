@@ -1,7 +1,7 @@
 #ifndef INJECTORPP_X86BEHAVIORCHANGER_H
 #define INJECTORPP_X86BEHAVIORCHANGER_H
 
-#include "BehaviorChanger.h"
+#include "behaviorchanger.h"
 
 namespace InjectorPP
 {

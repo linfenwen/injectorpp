@@ -1,6 +1,6 @@
 #include <vector>
 
-#include "X86WindowsBehaviorChanger.h"
+#include "windows/x86windowsbehaviorchanger.h"
 
 using std::vector;
 

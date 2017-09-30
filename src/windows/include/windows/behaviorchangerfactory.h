@@ -19,7 +19,7 @@
 #endif
 #endif
 
-#include "BehaviorChanger.h"
+#include "behaviorchanger.h"
 
 namespace InjectorPP
 {

@@ -1,4 +1,4 @@
-#include "SymbolInfoHelper.h"
+#include "windows/symbolinfohelper.h"
 
 namespace InjectorPP
 {

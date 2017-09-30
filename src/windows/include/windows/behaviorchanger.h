@@ -3,7 +3,7 @@
 
 #include <Windows.h>
 #include <vector>
-#include "OriginalFuncASM.h"
+#include "originalfuncasm.h"
 
 namespace InjectorPP
 {

@@ -1,10 +1,10 @@
 #ifndef INJECTORPP_CORE_H
 #define INJECTORPP_CORE_H
 
-#include "injectorcore.h"
 #include <iostream>
 #include <intrin.h>
 #include <stack>
+#include "injectorcore.h"
 
 namespace InjectorPP
 {

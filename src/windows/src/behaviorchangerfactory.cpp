@@ -1,7 +1,7 @@
 #include <stdexcept>
-#include "BehaviorChangerFactory.h"
+#include "windows/behaviorchangerfactory.h"
 #ifdef WINENVIRONMENT32
-#include "X86WindowsBehaviorChanger.h"
+#include "windows/x86windowsbehaviorchanger.h"
 #endif
 
 namespace InjectorPP

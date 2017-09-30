@@ -1,4 +1,4 @@
-#include "ClassResolver.h"
+#include "windows/classresolver.h"
 
 namespace InjectorPP
 {

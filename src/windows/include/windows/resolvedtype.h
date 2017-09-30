@@ -2,7 +2,7 @@
 #define INJECTORPP_RETURNTYPE_H
 
 #include <string>
-#include "SymbolEnums.h"
+#include "symbolenums.h"
 
 namespace InjectorPP
 {

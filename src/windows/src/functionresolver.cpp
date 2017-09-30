@@ -2,9 +2,9 @@
 #include <DbgHelp.h>
 #include <sstream>
 
-#include "SymbolInfoHelper.h"
-#include "FunctionResolver.h"
-#include "Utility.h"
+#include "windows/symbolinfohelper.h"
+#include "windows/functionresolver.h"
+#include "windows/utility.h"
 
 namespace InjectorPP
 {

@@ -7,11 +7,11 @@
 #include <vector>
 #include <map>
 
-#include "BehaviorChanger.h"
-#include "IFunctionResolver.h"
-#include "IClassResolver.h"
-#include "SymbolInfoHelper.h"
-#include "Class.h"
+#include "behaviorchanger.h"
+#include "ifunctionresolver.h"
+#include "iclassresolver.h"
+#include "symbolinfohelper.h"
+#include "class.h"
 
 namespace InjectorPP
 {

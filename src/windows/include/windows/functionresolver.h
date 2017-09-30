@@ -2,7 +2,7 @@
 #define INJECTORPP_FUNCTIONRESOLVER_H
 
 #include <vector>
-#include "IFunctionResolver.h"
+#include "ifunctionresolver.h"
 
 namespace InjectorPP
 {
