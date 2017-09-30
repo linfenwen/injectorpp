@@ -1,4 +1,4 @@
-#include "SubClassTest.h"
+#include "subclasstest.h"
 
 SubClassTest::SubClassTest()
 {

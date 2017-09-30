@@ -7,5 +7,7 @@ if (MSVC)
     set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 endif (MSVC)
 
+include_directories(src/windows/include)
+
 add_subdirectory(src)
 add_subdirectory(tests)

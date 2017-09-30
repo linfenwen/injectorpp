@@ -1,3 +1,5 @@
-include_directories(include)
 aux_source_directory(src injectorpp_src)
 add_library(injectorpp ${injectorpp_src})
+if (MSVC)
+    target_link_libraries(injectorpp dbgHelp)
+endif (MSVC)

@@ -1,4 +1,4 @@
-#include "BaseClassTest.h"
+#include "baseclasstest.h"
 
 BaseClassTest::BaseClassTest()
 {

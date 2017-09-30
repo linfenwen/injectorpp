@@ -115,7 +115,7 @@ namespace InjectorPP
 
     private:
         // Disable copy constructor.
-        // To adapt C++0x, we do not specific "=delete" here.
+        // To adapt C++98, we do not specific "=delete" here.
         Injector(const Injector&);
 
         InjectorCore* m_injectorCore;

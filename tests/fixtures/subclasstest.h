@@ -1,7 +1,7 @@
 #ifndef INJECTORPPTEST_FIXTURES_SUBCLASSTEST_H
 #define INJECTORPPTEST_FIXTURES_SUBCLASSTEST_H
 
-#include "BaseClassTest.h"
+#include "baseclasstest.h"
 
 class SubClassTest : public BaseClassTest
 {
