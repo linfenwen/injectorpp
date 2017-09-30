@@ -110,7 +110,7 @@ namespace InjectorPP
             asmCommand.push_back(0xC4);
             asmCommand.push_back(0x04);
 
-            if (functionType != 0)
+            if (functionType == 1 || functionType == 2)
             {
                 // 8B 4D F8             mov         ecx, dword ptr[ebp - 8]
                 asmCommand.push_back(0x8B);
@@ -130,7 +130,7 @@ namespace InjectorPP
             asmCommand.push_back(0xC9);
             asmCommand.push_back(0x01);
 
-            if (functionType != 0)
+            if (functionType == 1 || functionType == 2)
             {
                 // 89 4D F8             mov         dword ptr [ebp-8],ecx
                 asmCommand.push_back(0x89);
@@ -151,7 +151,7 @@ namespace InjectorPP
             asmCommand.push_back(0x08);
         }
 
-        if (functionType != 0)
+        if (functionType == 1 || functionType == 2)
         {
             // 83 C4 08             add         esp,8
             asmCommand.push_back(0x83);
@@ -192,7 +192,7 @@ namespace InjectorPP
         asmCommand.push_back(0x5D);
 
         // ret
-        if (returnType == 1 && functionType != 0)
+        if (returnType == 1 && (functionType == 1 || functionType == 2))
         {
             asmCommand.push_back(0xC2);
             asmCommand.push_back(0x04);
