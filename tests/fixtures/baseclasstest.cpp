@@ -20,12 +20,17 @@ std::string BaseClassTest::GetStringVirtual()
 
 int BaseClassTest::GetAnInteger()
 {
-    return -1;
+	return -1;
+}
+
+std::string fakefunc()
+{
+	return "fake";
 }
 
 std::string BaseClassTest::GetAString()
 {
-    return "Normal string";
+	return fakefunc();
 }
 
 std::string* BaseClassTest::GetAStringPointer()

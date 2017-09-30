@@ -31,7 +31,7 @@ std::string FakeStringFuncForBase()
     return "Faked base string";
 }
 
-TEST_F(FakeClassVirtualMethodTestFixture, MockBaseClassVirtualMemberFunctionWhenCalled)
+/*TEST_F(FakeClassVirtualMethodTestFixture, MockBaseClassVirtualMemberFunctionWhenCalled)
 {
     // Prepare
     int expected = 6;
@@ -91,4 +91,4 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockBaseClassVirtualMemberFunctionRetu
 
     delete base;
     base = NULL;
-}
+}*/

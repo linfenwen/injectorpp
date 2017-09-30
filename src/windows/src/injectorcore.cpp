@@ -130,7 +130,14 @@ namespace InjectorPP
     void InjectorCore::ReplaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction, bool isSourceStaticMemberFunction, bool isSourceVirtualMemberFunction)
     {
         bool isComplexReturn = false;
-        if (isSourceMemberFunction && !isSourceStaticMemberFunction)
+		ResolvedType returnType = this->m_functionResolver->GetMethodReturnTypeFromAddress((ULONG64)srcFunc);
+		if (returnType.SymbolTag != SymTagEnum::SymTagBaseType
+			&& returnType.SymbolTag != SymTagEnum::SymTagPointerType)
+		{
+			isComplexReturn = true;
+		}
+
+        /*if (isSourceMemberFunction && !isSourceStaticMemberFunction)
         {
             ResolvedType returnType = this->m_functionResolver->GetMethodReturnTypeFromAddress((ULONG64)srcFunc);
             if (returnType.SymbolTag != SymTagEnum::SymTagBaseType
@@ -138,13 +145,27 @@ namespace InjectorPP
             {
                 isComplexReturn = true;
             }
-        }
+        }*/
 
         // Save the original asm code. 
         // Useful when we recover the function behavior.
         OriginalFuncASM* originalFuncAsm = new OriginalFuncASM();
 
-        this->m_behaviorChanger->ReplaceFunction((ULONG64)srcFunc, (ULONG64)destFunc, originalFuncAsm, isComplexReturn, isSourceVirtualMemberFunction);
+		int functionType = 0;
+		if (isSourceMemberFunction)
+		{
+			if (isSourceStaticMemberFunction)
+			{
+				functionType = 4;
+			}
+			else
+			{
+				functionType = isSourceVirtualMemberFunction ? 2 : 1;
+			}
+		}
+		int functionReturnType = isComplexReturn ? 1 : 0;
+
+        this->m_behaviorChanger->ReplaceFunction((ULONG64)srcFunc, (ULONG64)destFunc, originalFuncAsm, functionType, functionReturnType);
 
         if (!this->SaveOriginalFuncASM(originalFuncAsm))
         {
