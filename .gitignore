@@ -239,3 +239,6 @@ _Pvt_Extensions
 .cproject
 .settings
 .project
+
+# injectorpp
+build/
