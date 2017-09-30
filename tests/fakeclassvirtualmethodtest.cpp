@@ -1,8 +1,8 @@
 #include "gmock/gmock.h"
 #include "windows/injector.h"
 #include <string>
-//#include "fixtures/BaseClassTest.h"
-//#include "fixtures/SubClassTest.h"
+#include "fixtures/baseclasstest.h"
+#include "fixtures/subclasstest.h"
 
 class FakeClassVirtualMethodTestFixture : public ::testing::Test
 {
@@ -26,7 +26,7 @@ int FakeIntFuncForBase()
     return 6;
 }
 
-/*std::string FakeStringFuncForBase()
+std::string FakeStringFuncForBase()
 {
     return "Faked base string";
 }
@@ -91,4 +91,4 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockBaseClassVirtualMemberFunctionRetu
 
     delete base;
     base = NULL;
-}*/
+}
