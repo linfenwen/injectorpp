@@ -6,7 +6,7 @@
 
 class FakeClassNonVirtualMethodTestFixture : public ::testing::Test
 {
-public:
+  public:
     int fakeFunc()
     {
         return 6;
@@ -17,9 +17,9 @@ public:
         return "Fake string func";
     }
 
-    std::string* fakeStringPointerFunc()
+    std::string *fakeStringPointerFunc()
     {
-        std::string* p = new std::string("Fake string pointer");
+        std::string *p = new std::string("Fake string pointer");
 
         return p;
     }
@@ -33,7 +33,7 @@ public:
         return addr;
     }
 
-protected:
+  protected:
     virtual void SetUp()
     {
     }
@@ -46,6 +46,11 @@ protected:
 std::string fooReturnString()
 {
     return "FooReturnString";
+}
+
+std::string fooReturnStringWithParameter(std::string input)
+{
+    return "FooReturnStringWithParameter";
 }
 
 std::string fakeFooReturnString()
@@ -76,14 +81,14 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringPointerFunctionWhenCalled
     // Prepare
     std::string expected = "Fake string pointer";
     InjectorPP::Injector injector;
-    
+
     injector.whenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::getAStringPointer))
         .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeStringPointerFunc));
 
     BaseClassTest b = BaseClassTest();
 
     // Act
-    std::string* actual = b.getAStringPointer();
+    std::string *actual = b.getAStringPointer();
 
     // Assert
     EXPECT_EQ(expected, *actual);
@@ -108,10 +113,26 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeGlobalStringFunctionWhenCalled)
     EXPECT_EQ(expected, actual);
 }
 
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeGlobalStringFunctionWithParameterWhenCalled)
+{
+    // Prepare
+    std::string expected = "FakeFooReturnString";
+    InjectorPP::Injector injector;
+
+    injector.whenCalled(fooReturnStringWithParameter)
+        .willExecute(fakeFooReturnString);
+
+    // Act
+    std::string actual = fooReturnStringWithParameter("Test input");
+
+    // Assert
+    EXPECT_EQ(expected, actual);
+}
+
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
 {
-	BaseClassTest b1;
-	std::string aa = b1.getAString();
+    BaseClassTest b1;
+    std::string aa = b1.getAString();
 
     // Prepare
     std::string expected = "Fake string func";
@@ -128,7 +149,6 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
     // Assert
     EXPECT_EQ(expected, actual);
 }
-
 
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionReturnUserDefinedClassWhenCalled)
 {
@@ -169,4 +189,3 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefined
     // Assert
     EXPECT_EQ(expected, actual);
 }
-
