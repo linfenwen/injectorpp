@@ -23,8 +23,31 @@ if not exist build (
     echo Creating build folder...
     md build
 )
+
+if "%INJECTOR_BUILD_VS_VERSION%" == "" (
+    set injectorBuildVSVersion=Visual Studio 14 2015
+) else if "%INJECTOR_BUILD_VS_VERSION%" == "Visual Studio 2013" (
+    set injectorBuildVSVersion=Visual Studio 12 2013
+) else if "%INJECTOR_BUILD_VS_VERSION%" == "Visual Studio 2015" (
+    set injectorBuildVSVersion=Visual Studio 14 2015
+) else if "%INJECTOR_BUILD_VS_VERSION%" == "Visual Studio 2017" (
+    set injectorBuildVSVersion=Visual Studio 15 2017
+)
+
+echo The visual studio version is "%injectorBuildVSVersion%"
+
 cd build
-cmake ../
+
+REM x86 Windows
+if not exist x86 (
+    md x86
+)
+cd x86
+cmake -G "%injectorBuildVSVersion%" ../../
+if errorlevel 1 (
+    set finalErrorLevel=1
+    goto exit
+)
 
 msbuild /nologo /t:injectorpp injectorpp.sln
 if errorlevel 1 (
@@ -45,13 +68,52 @@ if not %skiptests% == 1 (
         goto exit
     )
 
-    %~dp0\build\tests\Debug\injectorpp_test.exe
+    %~dp0\build\x86\tests\Debug\injectorpp_test.exe
     if errorlevel 1 (
         set finalErrorLevel=1
         goto exit
     )
 )
+cd ../
+
+REM x64 Windows
+if not exist x64 (
+    md x64
+)
+cd x64
+cmake -G "%injectorBuildVSVersion% Win64" ../../
+if errorlevel 1 (
+    set finalErrorLevel=1
+    goto exit
+)
+
+msbuild /nologo /t:injectorpp injectorpp.sln
+if errorlevel 1 (
+    set finalErrorLevel=1
+    goto exit
+)
+
+if not %skiptests% == 1 (
+    msbuild /nologo /t:gmock injectorpp.sln
+    if errorlevel 1 (
+        set finalErrorLevel=1
+        goto exit
+    )
+
+    msbuild /nologo /t:injectorpp_test injectorpp.sln
+    if errorlevel 1 (
+        set finalErrorLevel=1
+        goto exit
+    )
+
+    %~dp0\build\x64\tests\Debug\injectorpp_test.exe
+    if errorlevel 1 (
+        set finalErrorLevel=1
+        goto exit
+    )
+)
+cd ../..
 
 :exit
-cd ..
+cd %~dp0
 exit /b %finalErrorLevel%
