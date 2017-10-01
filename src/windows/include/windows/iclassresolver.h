@@ -9,7 +9,7 @@ namespace InjectorPP
     class IClassResolver
     {
     public:
-        virtual void ResolveMethods(const ULONG64& modBase, const std::string className, std::vector<Function>& resolvedMethods) = 0;
+        virtual void resolveMethods(const ULONG64& modBase, const std::string className, std::vector<Function>& resolvedMethods) = 0;
     };
 }
 

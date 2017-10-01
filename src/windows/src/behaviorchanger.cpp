@@ -13,7 +13,7 @@ namespace InjectorPP
     {
     }
 
-    void BehaviorChanger::DirectWriteToFunction(ULONG64 funcAddress, const byte* asmCode, size_t asmCodeSize)
+    void BehaviorChanger::directWriteToFunction(ULONG64 funcAddress, const byte* asmCode, size_t asmCodeSize)
     {
         WriteProcessMemory((HANDLE)-1, (void*)funcAddress, asmCode, asmCodeSize, 0);
     }

@@ -1,4 +1,5 @@
 @echo off
+set finalErrorLevel=0
 set skiptests=0
 if not "%~1"=="" (
     if "%~1" == "/f" (
@@ -26,10 +27,31 @@ cd build
 cmake ../
 
 msbuild /nologo /t:injectorpp injectorpp.sln
+if errorlevel 1 (
+    set finalErrorLevel=1
+    goto exit
+)
 
 if not %skiptests% == 1 (
     msbuild /nologo /t:gmock injectorpp.sln
+    if errorlevel 1 (
+        set finalErrorLevel=1
+        goto exit
+    )
+
     msbuild /nologo /t:injectorpp_test injectorpp.sln
+    if errorlevel 1 (
+        set finalErrorLevel=1
+        goto exit
+    )
+
     %~dp0\build\tests\Debug\injectorpp_test.exe
+    if errorlevel 1 (
+        set finalErrorLevel=1
+        goto exit
+    )
 )
+
+:exit
 cd ..
+exit /b %finalErrorLevel%

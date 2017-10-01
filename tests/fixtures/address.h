@@ -14,32 +14,32 @@ public:
 
     Address(const Address& rhs)
     {
-        this->zipCode = rhs.zipCode;
-        this->addressLine = rhs.addressLine;
+        this->m_zipCode = rhs.m_zipCode;
+        this->m_addressLine = rhs.m_addressLine;
     }
 
     Address& operator=(Address rhs)
     {
-        this->zipCode = rhs.zipCode;
-        this->addressLine = rhs.addressLine;
+        this->m_zipCode = rhs.m_zipCode;
+        this->m_addressLine = rhs.m_addressLine;
 
         return *this;
     }
 
     bool operator==(const Address& rhs) const
     {
-        return this->zipCode == rhs.zipCode && this->addressLine == rhs.addressLine;
+        return this->m_zipCode == rhs.m_zipCode && this->m_addressLine == rhs.m_addressLine;
     }
 
-    std::string GetZipCode();
-    void SetZipCode(const std::string& zipCode);
+    std::string getZipCode();
+    void setZipCode(const std::string& zipCode);
 
-    std::string GetAddressLine();
-    void SetAddressLine(const std::string& addressLine);
+    std::string getAddressLine();
+    void setAddressLine(const std::string& addressLine);
 
 private:
-    std::string zipCode;
-    std::string addressLine;
+    std::string m_zipCode;
+    std::string m_addressLine;
 };
 
 #endif

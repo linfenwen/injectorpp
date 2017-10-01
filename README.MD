@@ -5,18 +5,67 @@
 Injector++ is a library to help you fake virtual/non-virtual methods, static methods and global functions **WITHOUT** changing existing code.
 
 ## How to use
-It's extremely easy to mock class methods via Injector++.
 
-### Mock non-virtual methods
+## Prerequisites
 
-Below example fakes BaseClassTest::GetAnInteger() by using FakeFunc():
+### Windows
+- Injector++ only supports x86 Windows by now.
+- Injector++ needs to retrieve information from pdb, therefore please:
+- In Visual Studio, open project property dialog, select Configuration Properties -> Linker -> Debugging, change `Generate Debug Info` to `Debug`.
+- Add `dbgHelp.lib` as dependency in your test project setting.
+- Project property dialog -> Linker -> General -> Enable Incremental Linking -> `No (/INCREMENTAL:NO)`.
+
+### Linux
+In progress.
+
+### Mac OS
+In progress.
+
+## Mock global functions
+
+Below example fakes `fooReturnString` by using `fakeFooReturnString`:
+
+```cpp
+
+std::string fooReturnString()
+{
+    return "FooReturnString";
+}
+
+std::string fakeFooReturnString()
+{
+    return "FakeFooReturnString";
+}
+
+TEST_F(FakeClassNonVirtualMethodTestFixture, FakeGlobalStringFunctionWhenCalled)
+{
+    // Prepare
+    std::string expected = "FakeFooReturnString";
+    InjectorPP::Injector injector;
+
+    injector.whenCalled(fooReturnString)
+        .willExecute(fakeFooReturnString);
+
+    // Act
+    // fakeFooReturnString will be executued!
+    std::string actual = fooReturnString();
+
+    // Assert
+    EXPECT_EQ(expected, actual);
+}
+
+```
+
+## Mock non-virtual methods
+
+Below example fakes `BaseClassTest::getAnInteger()` by using `fakeFunc()`:
 
 ```cpp
 
 class FakeClassNonVirtualMethodTestFixture : public ::testing::Test
 {
 public:
-    int FakeFunc()
+    int fakeFunc()
     {
         return 6;
     }
@@ -28,14 +77,14 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeIntFunctionWhenCalled)
     int expected = 6;
     InjectorPP::Injector injector;
 
-    injector.WhenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::GetAnInteger))
-        .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeFunc));
+    injector.whenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::getAnInteger))
+        .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeFunc));
 
     BaseClassTest b = BaseClassTest();
 
     // Act
     // FakeFunc will be executed!
-    int actual = b.GetAnInteger();
+    int actual = b.getAnInteger();
 
     // Assert
     EXPECT_EQ(expected, actual);
@@ -43,7 +92,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeIntFunctionWhenCalled)
 
 ```
 
-### Mock virtual methods
+## Mock virtual methods
 Injector++ supports virtual method mocking (Amazing, huh?). Below is a simple example:
 
 ```cpp
@@ -60,12 +109,12 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
     BaseClassTest* derived = new SubClassTest();
 
     InjectorPP::Injector injector;
-    injector.WhenCalledVirtualMethod(derived, "GetAnIntegerVirtual")
-        .WillExecute(FakeIntFuncForDerived);
+    injector.whenCalledVirtualMethod(derived, "getAnIntegerVirtual")
+        .willExecute(fakeIntFuncForDerived);
 
     // Act
     // FakeIntFuncForDerived() will be exectued!
-    int actual = derived->GetAnIntegerVirtual();
+    int actual = derived->getAnIntegerVirtual();
 
     // Assert
     EXPECT_EQ(expected, actual);
@@ -76,7 +125,7 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
 
 ```
 
-### Mock static methods
+## Mock static methods
 Injector++ supports static method mocking. Below is a simple example:
 
 ```cpp
@@ -84,8 +133,8 @@ Injector++ supports static method mocking. Below is a simple example:
 Address FakeGetAnAddress()
 {
     Address addr;
-    addr.SetAddressLine("fakeAddressLine");
-    addr.SetZipCode("fakeZipCode");
+    addr.setAddressLine("fakeAddressLine");
+    addr.setZipCode("fakeZipCode");
 
     return addr;
 }
@@ -94,38 +143,23 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefined
 {
     // Prepare
     Address expected;
-    expected.SetAddressLine("fakeAddressLine");
-    expected.SetZipCode("fakeZipCode");
+    expected.setAddressLine("fakeAddressLine");
+    expected.setZipCode("fakeZipCode");
 
     InjectorPP::Injector injector;
 
-    injector.WhenCalled(INJECTORPP_STATIC_MEMBER_FUNCTION(BaseClassTest::GetAnAddressStatic))
-        .WillExecute(FakeGetAnAddress);
+    injector.whenCalled(INJECTORPP_STATIC_MEMBER_FUNCTION(BaseClassTest::getAnAddressStatic))
+        .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeGetAnAddress));
 
     // Act
     // FakeGetAnAddress will be executed!
-    Address actual = BaseClassTest::GetAnAddressStatic();
+    Address actual = BaseClassTest::getAnAddressStatic();
 
     // Assert
     EXPECT_EQ(expected, actual);
 }
 
 ```
-
-## Prerequisites
-
-### Windows
-- Injector++ only supports x86 Windows by now.
-- Injector++ needs to retrieve information from pdb, therefore please:
-- In Visual Studio, open project property dialog, select Configuration Properties -> Linker -> Debuggin, change Generate Debug Info to `Debug`.
-- Add `dbgHelp.lib` as dependency in your test project setting.
-- Project property dialog -> Linker -> General -> Enable Incremental Linking -> `No (/INCREMENTAL:NO)`.
-
-### Linux
-In progress.
-
-### Mac OS
-In progress.
 
 ## Roadmap
 There's a headache of C++ unit testing - No way to abstract the legacy code. As there's no reflection in C++, it is not that easy to change the behavior of non-virtual and static methods, which makes C++ unit testing extremely hard.
@@ -139,3 +173,32 @@ Injector++ intends to resolve the headache. Its goal is to make static method, n
 
 ## Contribute
 Welcome to help Injector++. You can submit bugs, suggestions and feature requests to the issue tracker, or send me pull request. Happy coding & testing!
+
+### Build the source code
+
+#### Windows
+
+You need following prerequisites:
+- cmake 2.6+
+- Visual Studio 2008+ (Please create an issue if you need older MSVC support)
+
+Run `.\build.cmd` to full build the source code as well as running tests.
+
+Run `.\build.cmd /f` to clean the build directory and rebuild all the source code and running tests.
+
+Run `.\build.cmd /skiptests` if you want build source code without building and running tests.
+
+You can combine `/f` and `/skiptests`:
+
+```sh
+.\build.cmd /f /skiptests
+```
+
+After build finished, you'll find `injectorpp.sln` under `build` folder. You can use Visual Studio to edit and debug the code.
+
+#### Linux
+In progress.
+
+#### Mac OS
+In progress.
+

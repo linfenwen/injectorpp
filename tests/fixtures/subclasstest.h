@@ -9,8 +9,8 @@ public:
     SubClassTest();
     virtual ~SubClassTest();
 
-    virtual int GetAnIntegerVirtual();
-    virtual std::string GetStringVirtual();
+    virtual int getAnIntegerVirtual();
+    virtual std::string getStringVirtual();
 };
 
 #endif

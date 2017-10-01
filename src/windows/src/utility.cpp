@@ -13,7 +13,7 @@ namespace InjectorPP
     {
     }
 
-    std::string Utility::GetLastErrorStdStr()
+    std::string Utility::getLastErrorStdStr()
     {
         DWORD error = GetLastError();
         if (error)
@@ -42,7 +42,7 @@ namespace InjectorPP
         return std::string();
     }
 
-    std::string Utility::W2M(const wchar_t* str)
+    std::string Utility::w2m(const wchar_t* str)
     {
         int muLen = WideCharToMultiByte(CP_ACP, 0, str, -1, NULL, 0, NULL, NULL);
         if (muLen == 0)
@@ -64,7 +64,7 @@ namespace InjectorPP
         return temp;
     }
 
-    std::vector<std::string>& Utility::Split(const std::string &s, char delim, std::vector<std::string> &elems)
+    std::vector<std::string>& Utility::split(const std::string &s, char delim, std::vector<std::string> &elems)
     {
         std::stringstream ss(s);
         std::string item;
@@ -77,10 +77,10 @@ namespace InjectorPP
     }
 
 
-    std::vector<std::string> Utility::Split(const std::string &s, char delim)
+    std::vector<std::string> Utility::split(const std::string &s, char delim)
     {
         std::vector<std::string> elems;
-        Utility::Split(s, delim, elems);
+        Utility::split(s, delim, elems);
 
         return elems;
     }

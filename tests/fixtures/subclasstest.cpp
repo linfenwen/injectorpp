@@ -8,12 +8,12 @@ SubClassTest::~SubClassTest()
 {
 }
 
-int SubClassTest::GetAnIntegerVirtual()
+int SubClassTest::getAnIntegerVirtual()
 {
     return 1;
 }
 
-std::string SubClassTest::GetStringVirtual()
+std::string SubClassTest::getStringVirtual()
 {
     return "Normal sub string";
 }

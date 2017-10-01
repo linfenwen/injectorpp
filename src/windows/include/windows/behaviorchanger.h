@@ -16,9 +16,9 @@ namespace InjectorPP
         virtual ~BehaviorChanger();
 
         // A magic function to change the function behavior at runtime.
-        virtual void ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, FunctionType functionType, FunctionReturnType returnType) = 0;
+        virtual void replaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, FunctionType functionType, FunctionReturnType returnType) = 0;
 
-        virtual void DirectWriteToFunction(ULONG64 funcAddress, const byte* asmCode, size_t asmCodeSize);
+        virtual void directWriteToFunction(ULONG64 funcAddress, const byte* asmCode, size_t asmCodeSize);
     private:
         BehaviorChanger(const BehaviorChanger&);
     };

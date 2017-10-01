@@ -14,7 +14,7 @@ X86WindowsBehaviorChanger::~X86WindowsBehaviorChanger()
 {
 }
 
-void X86WindowsBehaviorChanger::ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM *originalFuncAsm, FunctionType functionType, FunctionReturnType returnType)
+void X86WindowsBehaviorChanger::replaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM *originalFuncAsm, FunctionType functionType, FunctionReturnType returnType)
 {
     // The idea is hijack the original function, inject op codes to let it 
     // jump to the target function.
@@ -238,6 +238,6 @@ void X86WindowsBehaviorChanger::ReplaceFunction(ULONG64 sourceFuncAddress, ULONG
     ReadProcessMemory((HANDLE)-1, (void *)originalFuncAsm->funcAddress, originalFuncAsm->asmCode, injectedCodeSize, 0);
 
     // Then inject the code to source function.
-    this->DirectWriteToFunction(sourceFuncAddress, &asmCommand[0], injectedCodeSize);
+    this->directWriteToFunction(sourceFuncAddress, &asmCommand[0], injectedCodeSize);
 }
 }

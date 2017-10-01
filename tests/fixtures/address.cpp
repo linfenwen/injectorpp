@@ -5,23 +5,23 @@
 
 using std::string;
 
-std::string Address::GetZipCode()
+std::string Address::getZipCode()
 {
-    return this->zipCode;
+    return this->m_zipCode;
 }
 
-void Address::SetZipCode(const std::string& zipCode)
+void Address::setZipCode(const std::string& zipCode)
 {
-    this->zipCode = zipCode;
+    this->m_zipCode = zipCode;
 }
 
-std::string Address::GetAddressLine()
+std::string Address::getAddressLine()
 {
-    return this->addressLine;
+    return this->m_addressLine;
 }
 
-void Address::SetAddressLine(const std::string& addressLine)
+void Address::setAddressLine(const std::string& addressLine)
 {
-    this->addressLine = addressLine;
+    this->m_addressLine = addressLine;
 }
 

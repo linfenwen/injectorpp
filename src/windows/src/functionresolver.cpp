@@ -30,7 +30,7 @@ namespace InjectorPP
 
             if (functionSymName != NULL)
             {
-                newParam.Type = Utility::W2M(functionSymName);
+                newParam.Type = Utility::w2m(functionSymName);
             }
 
             params->push_back(newParam);
@@ -49,7 +49,7 @@ namespace InjectorPP
     {
     }
 
-    ResolvedType FunctionResolver::GetMethodReturnTypeFromAddress(const ULONG64& funcAddress)
+    ResolvedType FunctionResolver::getMethodReturnTypeFromAddress(const ULONG64& funcAddress)
     {
         SymbolInfoHelper* pSymbolInfoHelper = new SymbolInfoHelper();
         //PSYMBOL_INFO symbol = pSymbolInfoHelper->AllocSymbol(256);
@@ -72,7 +72,7 @@ namespace InjectorPP
             return resolvedType;
         }
 
-        resolvedType = this->ResolveReturnType(symbol->ModBase, symbol->TypeIndex);
+        resolvedType = this->resolveReturnType(symbol->ModBase, symbol->TypeIndex);
 
         delete pSymbolInfoHelper;
         pSymbolInfoHelper = NULL;
@@ -80,7 +80,7 @@ namespace InjectorPP
         return resolvedType;
     }
 
-    std::string FunctionResolver::GetMethodSymbolFromAddress(const ULONG64& funcAddress)
+    std::string FunctionResolver::getMethodSymbolFromAddress(const ULONG64& funcAddress)
     {
         SymbolInfoHelper* pSymbolInfoHelper = new SymbolInfoHelper();
         //PSYMBOL_INFO symbol = pSymbolInfoHelper->AllocSymbol(256);
@@ -109,7 +109,7 @@ namespace InjectorPP
         return functionSymName;
     }
 
-    void FunctionResolver::Resolve(const ULONG64& modBase, const ULONG& typeIndex, Function& resolvedFunction)
+    void FunctionResolver::resolve(const ULONG64& modBase, const ULONG& typeIndex, Function& resolvedFunction)
     {
         // Get function's memory address.
         ULONG64 functionAddress = 0;
@@ -128,13 +128,13 @@ namespace InjectorPP
         }
 
         // Get function's return type.
-        ResolvedType returnType = this->ResolveReturnType(modBase, typeIndex);
+        ResolvedType returnType = this->resolveReturnType(modBase, typeIndex);
 
         // Get function's parameters.
         std::vector<FunctionParameter> parameters;
-        this->ResolveParameters(functionAddress, modBase, typeIndex, parameters);
+        this->resolveParameters(functionAddress, modBase, typeIndex, parameters);
 
-        resolvedFunction.Name = Utility::W2M(functionSymName);
+        resolvedFunction.Name = Utility::w2m(functionSymName);
 
         size_t scopeIdentifierIndex = resolvedFunction.Name.find("::");
         if (scopeIdentifierIndex != std::string::npos)
@@ -151,7 +151,7 @@ namespace InjectorPP
         resolvedFunction.Address = functionAddress;
     }
 
-    ResolvedType FunctionResolver::ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex)
+    ResolvedType FunctionResolver::resolveReturnType(const ULONG64& modBase, const ULONG& typeIndex)
     {
         // Let's resolve return type.
 
@@ -161,12 +161,12 @@ namespace InjectorPP
 
         // We got the return type index, now resolve it as string.
         ResolvedType returnType;
-        this->LoadType(modBase, functionReturnTypeIndex, returnType);
+        this->loadType(modBase, functionReturnTypeIndex, returnType);
 
         return returnType;
     }
 
-    void FunctionResolver::ResolveParameters(const ULONG64& functionAddress, const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters)
+    void FunctionResolver::resolveParameters(const ULONG64& functionAddress, const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters)
     {
         IMAGEHLP_STACK_FRAME sf;
 
@@ -181,7 +181,7 @@ namespace InjectorPP
         SymEnumSymbols(this->m_hProcess, NULL, NULL, EnumParamsCallback, &resolvedParameters);
     }
 
-    void FunctionResolver::LoadBasicType(BasicType bt, ULONG64 byteSize, ResolvedType& resolvedType)
+    void FunctionResolver::loadBasicType(BasicType bt, ULONG64 byteSize, ResolvedType& resolvedType)
     {
         // To represent what kind of object we have i use a VARIANT which
         // can hold a lot of different types.
@@ -309,7 +309,7 @@ namespace InjectorPP
         }
     }
 
-    void FunctionResolver::LoadType(ULONG64 modBase, ULONG typeIndex, ResolvedType& resolvedType)
+    void FunctionResolver::loadType(ULONG64 modBase, ULONG typeIndex, ResolvedType& resolvedType)
     {
         // Sadly loading the actual name of the type must be done in several different
         // ways for different types. To see which one we need to follow we first take
@@ -340,7 +340,7 @@ namespace InjectorPP
             SymGetTypeInfo(m_hProcess, modBase, typeIndex, TI_GET_LENGTH, &length);
 
             resolvedType.SymbolTag = SymTagBaseType;
-            LoadBasicType(bt, length, resolvedType);
+            loadBasicType(bt, length, resolvedType);
 
             return;
         }
@@ -352,7 +352,8 @@ namespace InjectorPP
             SymGetTypeInfo(m_hProcess, modBase, typeIndex, TI_GET_TYPE, &subType);
 
             resolvedType.SymbolTag = SymTagPointerType;
-            LoadPointerType(modBase, typeIndex, subType, resolvedType);
+            loadPointerType(modBase, typeIndex, subType, resolvedType);
+            
             // We need to override the possible type set by LoadPointerType because it should
             // only take an address when we evaluate it.
             m_value.vt = VT_BLOB;
@@ -380,7 +381,7 @@ namespace InjectorPP
         }
     }
 
-    void FunctionResolver::LoadPointerType(ULONG64 modBase, ULONG typeIndex, ULONG type, ResolvedType& resolvedType)
+    void FunctionResolver::loadPointerType(ULONG64 modBase, ULONG typeIndex, ULONG type, ResolvedType& resolvedType)
     {
         // This function does exactly the same as LoadType does except
         // that it adds a * to the type name
@@ -394,7 +395,7 @@ namespace InjectorPP
             SymGetTypeInfo(m_hProcess, modBase, type, TI_GET_BASETYPE, &bt);
             ULONG64 length = 0;
             SymGetTypeInfo(m_hProcess, modBase, type, TI_GET_LENGTH, &length);
-            LoadBasicType(bt, length, resolvedType);
+            loadBasicType(bt, length, resolvedType);
             resolvedType.Name += '*';
 
             return;
@@ -405,7 +406,7 @@ namespace InjectorPP
             SymGetTypeInfo(m_hProcess, modBase, type, TI_GET_TYPE, &subType);
             // We recursively call ourselfs until we dont have a PointerType anymore
             // for example in char*** we need to call it 3 times
-            LoadPointerType(modBase, typeIndex, subType, resolvedType);
+            loadPointerType(modBase, typeIndex, subType, resolvedType);
             resolvedType.Name += '*';
 
             return;

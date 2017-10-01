@@ -15,7 +15,7 @@ namespace InjectorPP
     {
     }
 
-    void X64WindowsBehaviorChanger::ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, FunctionType functionType, FunctionReturnType returnType)
+    void X64WindowsBehaviorChanger::replaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, FunctionType functionType, FunctionReturnType returnType)
     {
         throw std::logic_error("Not supported yet.");
     }

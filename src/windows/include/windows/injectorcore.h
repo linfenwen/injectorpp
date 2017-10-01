@@ -22,18 +22,18 @@ namespace InjectorPP
 
         virtual ~InjectorCore();
 
-        void Initialize();
+        void initialize();
 
-        void* GetVirtualMethodAddress(void* classInstance, const std::string& virtualMethodName);
+        void* getVirtualMethodAddress(void* classInstance, const std::string& virtualMethodName);
 
-        void ReplaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction, bool isSourceStaticMemberFunction, bool isSourceVirtualMemberFunction);
+        void replaceFunction(void* srcFunc, void* destFunc, bool isSourceMemberFunction, bool isSourceStaticMemberFunction, bool isSourceVirtualMemberFunction);
 
     private:
         InjectorCore(const InjectorCore&);
 
-        void RecoverAllReplacedFunctions();
+        void recoverAllReplacedFunctions();
 
-        bool SaveOriginalFuncASM(OriginalFuncASM* originalFuncASM);
+        bool saveOriginalFuncASM(OriginalFuncASM* originalFuncASM);
 
         std::vector<void*> m_allocatedTypeInstances;
 

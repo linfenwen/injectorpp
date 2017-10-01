@@ -19,7 +19,7 @@ InjectorCore::InjectorCore()
       m_currentProcessHandler(NULL)
 {
     this->m_currentProcessHandler = GetCurrentProcess();
-    this->m_behaviorChanger = BehaviorChangerFactory::Create();
+    this->m_behaviorChanger = BehaviorChangerFactory::create();
     this->m_functionResolver = new FunctionResolver(this->m_currentProcessHandler);
     this->m_classResolver = new ClassResolver(this->m_currentProcessHandler, this->m_functionResolver);
     this->m_symbolInfoHelper = new SymbolInfoHelper();
@@ -50,7 +50,7 @@ InjectorCore::~InjectorCore()
     }
 
     // Release all original function asms and recover the replaced functions.
-    this->RecoverAllReplacedFunctions();
+    this->recoverAllReplacedFunctions();
 
     if (this->m_symbolInfoHelper != NULL)
     {
@@ -77,7 +77,7 @@ InjectorCore::~InjectorCore()
     }
 }
 
-void InjectorCore::Initialize()
+void InjectorCore::initialize()
 {
     if (!InjectorCore::m_isSymInitialized)
     {
@@ -91,7 +91,7 @@ void InjectorCore::Initialize()
     }
 }
 
-void *InjectorCore::GetVirtualMethodAddress(void *classInstance, const std::string &virtualMethodName)
+void *InjectorCore::getVirtualMethodAddress(void *classInstance, const std::string &virtualMethodName)
 {
     void *result = NULL;
 
@@ -104,7 +104,7 @@ void *InjectorCore::GetVirtualMethodAddress(void *classInstance, const std::stri
     while (*virtualMethodAddress != NULL)
     {
         ULONG64 address = (ULONG64)*virtualMethodAddress;
-        std::string funcSymName = this->m_functionResolver->GetMethodSymbolFromAddress(address);
+        std::string funcSymName = this->m_functionResolver->getMethodSymbolFromAddress(address);
 
         // Is this function symbol name contains the virtual method name?
         if (funcSymName.find(decoratedMethodName) != std::string::npos || funcSymName.find("::" + virtualMethodName) != std::string::npos)
@@ -126,10 +126,10 @@ void *InjectorCore::GetVirtualMethodAddress(void *classInstance, const std::stri
     return result;
 }
 
-void InjectorCore::ReplaceFunction(void *srcFunc, void *destFunc, bool isSourceMemberFunction, bool isSourceStaticMemberFunction, bool isSourceVirtualMemberFunction)
+void InjectorCore::replaceFunction(void *srcFunc, void *destFunc, bool isSourceMemberFunction, bool isSourceStaticMemberFunction, bool isSourceVirtualMemberFunction)
 {
     bool isComplexReturn = false;
-    ResolvedType returnType = this->m_functionResolver->GetMethodReturnTypeFromAddress((ULONG64)srcFunc);
+    ResolvedType returnType = this->m_functionResolver->getMethodReturnTypeFromAddress((ULONG64)srcFunc);
     if (returnType.SymbolTag != SymTagEnum::SymTagBaseType && returnType.SymbolTag != SymTagEnum::SymTagPointerType)
     {
         isComplexReturn = true;
@@ -153,16 +153,16 @@ void InjectorCore::ReplaceFunction(void *srcFunc, void *destFunc, bool isSourceM
     }
     FunctionReturnType functionReturnType = isComplexReturn ? FunctionReturnType::ComplexReturnType : FunctionReturnType::BasicReturnType;
 
-    this->m_behaviorChanger->ReplaceFunction((ULONG64)srcFunc, (ULONG64)destFunc, originalFuncAsm, functionType, functionReturnType);
+    this->m_behaviorChanger->replaceFunction((ULONG64)srcFunc, (ULONG64)destFunc, originalFuncAsm, functionType, functionReturnType);
 
-    if (!this->SaveOriginalFuncASM(originalFuncAsm))
+    if (!this->saveOriginalFuncASM(originalFuncAsm))
     {
         delete originalFuncAsm;
         originalFuncAsm = NULL;
     }
 }
 
-void InjectorCore::RecoverAllReplacedFunctions()
+void InjectorCore::recoverAllReplacedFunctions()
 {
     // Release all original function asms.
     std::vector<OriginalFuncASM *>::iterator ofaIt;
@@ -171,7 +171,7 @@ void InjectorCore::RecoverAllReplacedFunctions()
         if (*ofaIt != NULL)
         {
             // Recover the original function behavior.
-            this->m_behaviorChanger->DirectWriteToFunction((*ofaIt)->funcAddress, (*ofaIt)->asmCode, 6);
+            this->m_behaviorChanger->directWriteToFunction((*ofaIt)->funcAddress, (*ofaIt)->asmCode, 6);
 
             delete *ofaIt;
             *ofaIt = NULL;
@@ -181,7 +181,7 @@ void InjectorCore::RecoverAllReplacedFunctions()
     this->m_originalFunctionASMVector.clear();
 }
 
-bool InjectorCore::SaveOriginalFuncASM(OriginalFuncASM *originalFuncASM)
+bool InjectorCore::saveOriginalFuncASM(OriginalFuncASM *originalFuncASM)
 {
     if (originalFuncASM->funcAddress == 0)
     {

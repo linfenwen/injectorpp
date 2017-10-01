@@ -15,7 +15,7 @@ namespace InjectorPP
 
         virtual ~ClassResolver();
 
-        virtual void ResolveMethods(const ULONG64& modBase, const std::string className, std::vector<Function>& resolvedMethods);
+        virtual void resolveMethods(const ULONG64& modBase, const std::string className, std::vector<Function>& resolvedMethods);
 
     private:
         HANDLE m_hProcess;

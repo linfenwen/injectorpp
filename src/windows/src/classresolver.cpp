@@ -26,9 +26,9 @@ namespace InjectorPP
         }
     }
 
-    void ClassResolver::ResolveMethods(const ULONG64& modBase, const std::string className, std::vector<Function>& resolvedMethods)
+    void ClassResolver::resolveMethods(const ULONG64& modBase, const std::string className, std::vector<Function>& resolvedMethods)
     {
-        PSYMBOL_INFO classSymbol = this->m_symbolInfoHelper->AllocSymbol();
+        PSYMBOL_INFO classSymbol = this->m_symbolInfoHelper->allocSymbol();
 
         // Retrieve class symbol.
         if (SymGetTypeFromName(this->m_hProcess, modBase, className.c_str(), classSymbol) == FALSE)
@@ -73,7 +73,7 @@ namespace InjectorPP
 
             // Resolve function.
             Function resolvedFunction;
-            this->m_functionResolver->Resolve(classSymbol->ModBase, curChild, resolvedFunction);
+            this->m_functionResolver->resolve(classSymbol->ModBase, curChild, resolvedFunction);
 
             // Add the resolved function to the output.
             resolvedMethods.push_back(resolvedFunction);
