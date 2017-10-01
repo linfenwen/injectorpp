@@ -7,28 +7,28 @@
 class FakeClassNonVirtualMethodTestFixture : public ::testing::Test
 {
 public:
-    int FakeFunc()
+    int fakeFunc()
     {
         return 6;
     }
 
-    std::string FakeStringFunc()
+    std::string fakeStringFunc()
     {
         return "Fake string func";
     }
 
-    std::string* FakeStringPointerFunc()
+    std::string* fakeStringPointerFunc()
     {
         std::string* p = new std::string("Fake string pointer");
 
         return p;
     }
 
-    Address FakeGetAnAddress()
+    Address fakeGetAnAddress()
     {
         Address addr;
-        addr.SetAddressLine("fakeAddressLine");
-        addr.SetZipCode("fakeZipCode");
+        addr.setAddressLine("fakeAddressLine");
+        addr.setZipCode("fakeZipCode");
 
         return addr;
     }
@@ -43,19 +43,14 @@ protected:
     }
 };
 
-std::string FooReturnString()
+std::string fooReturnString()
 {
     return "FooReturnString";
 }
 
-std::string FakeFooReturnString()
+std::string fakeFooReturnString()
 {
     return "FakeFooReturnString";
-}
-
-std::string ddd()
-{
-	return FakeFooReturnString();
 }
 
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeIntFunctionWhenCalled)
@@ -64,13 +59,13 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeIntFunctionWhenCalled)
     int expected = 6;
     InjectorPP::Injector injector;
 
-    injector.WhenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::GetAnInteger))
-        .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeFunc));
+    injector.whenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::getAnInteger))
+        .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeFunc));
 
     BaseClassTest b = BaseClassTest();
 
     // Act
-    int actual = b.GetAnInteger();
+    int actual = b.getAnInteger();
 
     // Assert
     EXPECT_EQ(expected, actual);
@@ -82,13 +77,13 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringPointerFunctionWhenCalled
     std::string expected = "Fake string pointer";
     InjectorPP::Injector injector;
     
-    injector.WhenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::GetAStringPointer))
-        .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeStringPointerFunc));
+    injector.whenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::getAStringPointer))
+        .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeStringPointerFunc));
 
     BaseClassTest b = BaseClassTest();
 
     // Act
-    std::string* actual = b.GetAStringPointer();
+    std::string* actual = b.getAStringPointer();
 
     // Assert
     EXPECT_EQ(expected, *actual);
@@ -103,11 +98,11 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeGlobalStringFunctionWhenCalled)
     std::string expected = "FakeFooReturnString";
     InjectorPP::Injector injector;
 
-    injector.WhenCalled(FooReturnString)
-        .WillExecute(FakeFooReturnString);
+    injector.whenCalled(fooReturnString)
+        .willExecute(fakeFooReturnString);
 
     // Act
-    std::string actual = FooReturnString();
+    std::string actual = fooReturnString();
 
     // Assert
     EXPECT_EQ(expected, actual);
@@ -116,19 +111,19 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeGlobalStringFunctionWhenCalled)
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
 {
 	BaseClassTest b1;
-	std::string aa = b1.GetAString();
+	std::string aa = b1.getAString();
 
     // Prepare
     std::string expected = "Fake string func";
     InjectorPP::Injector injector;
 
-    injector.WhenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::GetAString))
-        .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeStringFunc));
+    injector.whenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::getAString))
+        .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeStringFunc));
 
     BaseClassTest b;
 
     // Act
-    std::string actual = b.GetAString();
+    std::string actual = b.getAString();
 
     // Assert
     EXPECT_EQ(expected, actual);
@@ -139,18 +134,18 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeFunctionReturnUserDefinedClassW
 {
     // Prepare
     Address expected;
-    expected.SetAddressLine("fakeAddressLine");
-    expected.SetZipCode("fakeZipCode");
+    expected.setAddressLine("fakeAddressLine");
+    expected.setZipCode("fakeZipCode");
 
     InjectorPP::Injector injector;
 
-    injector.WhenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::GetAnAddress))
-        .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeGetAnAddress));
+    injector.whenCalled(INJECTORPP_MEMBER_FUNCTION(BaseClassTest::getAnAddress))
+        .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeGetAnAddress));
 
     BaseClassTest b;
 
     // Act
-    Address actual = b.GetAnAddress();
+    Address actual = b.getAnAddress();
 
     // Assert
     EXPECT_EQ(expected, actual);
@@ -160,16 +155,16 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefined
 {
     // Prepare
     Address expected;
-    expected.SetAddressLine("fakeAddressLine");
-    expected.SetZipCode("fakeZipCode");
+    expected.setAddressLine("fakeAddressLine");
+    expected.setZipCode("fakeZipCode");
 
     InjectorPP::Injector injector;
 
-    injector.WhenCalled(INJECTORPP_STATIC_MEMBER_FUNCTION(BaseClassTest::GetAnAddressStatic))
-        .WillExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::FakeGetAnAddress));
+    injector.whenCalled(INJECTORPP_STATIC_MEMBER_FUNCTION(BaseClassTest::getAnAddressStatic))
+        .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeGetAnAddress));
 
     // Act
-    Address actual = BaseClassTest::GetAnAddressStatic();
+    Address actual = BaseClassTest::getAnAddressStatic();
 
     // Assert
     EXPECT_EQ(expected, actual);

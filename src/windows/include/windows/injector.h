@@ -23,7 +23,7 @@ namespace InjectorPP
             :m_injectorCore(NULL)
         {
             this->m_injectorCore = new InjectorCore();
-            this->m_injectorCore->Initialize();
+            this->m_injectorCore->initialize();
         }
 
         virtual ~Injector()
@@ -45,7 +45,7 @@ namespace InjectorPP
             }
         }
 
-        Injector& WhenCalled(void* srcMockFunc, bool isMemberFunction = false, bool isStaticMemberFunction = false)
+        Injector& whenCalled(void* srcMockFunc, bool isMemberFunction = false, bool isStaticMemberFunction = false)
         {
             FunctionWrapper* functionWrapper = new FunctionWrapper();
             functionWrapper->functionAddress = srcMockFunc;
@@ -58,9 +58,9 @@ namespace InjectorPP
             return *this;
         }
 
-        Injector& WhenCalledVirtualMethod(void* classInstance, const std::string& virtualMethodName)
+        Injector& whenCalledVirtualMethod(void* classInstance, const std::string& virtualMethodName)
         {
-            void* virtualFunction = this->m_injectorCore->GetVirtualMethodAddress(classInstance, virtualMethodName);
+            void* virtualFunction = this->m_injectorCore->getVirtualMethodAddress(classInstance, virtualMethodName);
 
             FunctionWrapper* functionWrapper = new FunctionWrapper();
             functionWrapper->functionAddress = virtualFunction;
@@ -73,7 +73,7 @@ namespace InjectorPP
             return *this;
         }
 
-        Injector& WillExecute(void* destMockFunc, bool isMemberFunction = false, bool isStaticMemberFunction = false)
+        Injector& willExecute(void* destMockFunc, bool isMemberFunction = false, bool isStaticMemberFunction = false)
         {
             if (this->m_whenCalledFunc.empty())
             {
@@ -88,7 +88,7 @@ namespace InjectorPP
             FunctionWrapper* srcFunctionWrapper = this->m_whenCalledFunc.top();
             this->m_whenCalledFunc.pop();
 
-            this->m_injectorCore->ReplaceFunction(srcFunctionWrapper->functionAddress,
+            this->m_injectorCore->replaceFunction(srcFunctionWrapper->functionAddress,
                 destMockFunc,
                 srcFunctionWrapper->isMemberFunction,
                 srcFunctionWrapper->isStaticMemberFunction,

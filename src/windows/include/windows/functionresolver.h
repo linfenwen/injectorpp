@@ -16,34 +16,33 @@ namespace InjectorPP
 
         virtual ~FunctionResolver();
 
-        virtual void Resolve(const ULONG64& modBase, const ULONG& typeIndex, Function& resolvedFunction);
+        virtual void resolve(const ULONG64& modBase, const ULONG& typeIndex, Function& resolvedFunction);
 
-        virtual std::string GetMethodSymbolFromAddress(const ULONG64& funcAddress);
+        virtual std::string getMethodSymbolFromAddress(const ULONG64& funcAddress);
 
-        virtual ResolvedType GetMethodReturnTypeFromAddress(const ULONG64& funcAddress);
+        virtual ResolvedType getMethodReturnTypeFromAddress(const ULONG64& funcAddress);
 
     protected:
         // Resolve the function return type.
-        virtual ResolvedType ResolveReturnType(const ULONG64& modBase, const ULONG& typeIndex);
+        virtual ResolvedType resolveReturnType(const ULONG64& modBase, const ULONG& typeIndex);
 
-        virtual void ResolveParameters(const ULONG64& functionAddress, const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters);
+        virtual void resolveParameters(const ULONG64& functionAddress, const ULONG64& modBase, const ULONG& typeIndex, std::vector<FunctionParameter>& resolvedParameters);
     private:
         // Disable copy constructor.
         FunctionResolver(const FunctionResolver&);
 
         // Loads the name of the type of that symbol
-        void LoadType(ULONG64 modBase, ULONG typeIndex, ResolvedType& resolvedType);
+        void loadType(ULONG64 modBase, ULONG typeIndex, ResolvedType& resolvedType);
 
         // Loads a basic type (int, float, char, ...)
-        void LoadBasicType(BasicType bt, ULONG64 byteSize, ResolvedType& resolvedType);
+        void loadBasicType(BasicType bt, ULONG64 byteSize, ResolvedType& resolvedType);
 
         // Loads the type pointed to
-        void LoadPointerType(ULONG64 modBase, ULONG typeIndex, ULONG subType, ResolvedType& resolvedType);
+        void loadPointerType(ULONG64 modBase, ULONG typeIndex, ULONG subType, ResolvedType& resolvedType);
 
+        HANDLE m_hProcess;
         VARIANT m_value;
         std::string m_objName;
-        //std::string m_typeName;
-        HANDLE m_hProcess;
         std::string m_enumValue;
     };
 }

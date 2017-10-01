@@ -14,7 +14,7 @@ namespace InjectorPP
     {
     }
 
-    BehaviorChanger* BehaviorChangerFactory::Create()
+    BehaviorChanger* BehaviorChangerFactory::create()
     {
 #ifdef WINENVIRONMENT32
         return new X86WindowsBehaviorChanger();

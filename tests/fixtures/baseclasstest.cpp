@@ -8,17 +8,17 @@ BaseClassTest::~BaseClassTest()
 {
 }
 
-int BaseClassTest::GetAnIntegerVirtual()
+int BaseClassTest::getAnIntegerVirtual()
 {
     return 0;
 }
 
-std::string BaseClassTest::GetStringVirtual()
+std::string BaseClassTest::getStringVirtual()
 {
     return "Normal base string";
 }
 
-int BaseClassTest::GetAnInteger()
+int BaseClassTest::getAnInteger()
 {
 	return -1;
 }
@@ -28,32 +28,32 @@ std::string fakefunc()
 	return "fake";
 }
 
-std::string BaseClassTest::GetAString()
+std::string BaseClassTest::getAString()
 {
 	return fakefunc();
 }
 
-std::string* BaseClassTest::GetAStringPointer()
+std::string* BaseClassTest::getAStringPointer()
 {
     std::string* p = new std::string("Normal string pointer.");
 
     return p;
 }
 
-Address BaseClassTest::GetAnAddress()
+Address BaseClassTest::getAnAddress()
 {
     Address addr;
-    addr.SetAddressLine("normalAddressLine");
-    addr.SetZipCode("normalZipCode");
+    addr.setAddressLine("normalAddressLine");
+    addr.setZipCode("normalZipCode");
 
     return addr;
 }
 
-Address BaseClassTest::GetAnAddressStatic()
+Address BaseClassTest::getAnAddressStatic()
 {
     Address addr;
-    addr.SetAddressLine("normalAddressLine");
-    addr.SetZipCode("normalZipCode");
+    addr.setAddressLine("normalAddressLine");
+    addr.setZipCode("normalZipCode");
 
     return addr;
 }

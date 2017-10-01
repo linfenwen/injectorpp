@@ -21,7 +21,7 @@ namespace InjectorPP
         }
     }
 
-    PSYMBOL_INFO SymbolInfoHelper::AllocSymbol(int nameLen)
+    PSYMBOL_INFO SymbolInfoHelper::allocSymbol(int nameLen)
     {
         void* space = malloc(sizeof(SYMBOL_INFO) + nameLen);
         memset(space, 0, sizeof(SYMBOL_INFO) + nameLen);

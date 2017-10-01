@@ -16,17 +16,17 @@ protected:
     }
 };
 
-int FakeIntFuncForDerived()
+int fakeIntFuncForDerived()
 {
     return 2;
 }
 
-int FakeIntFuncForBase()
+int fakeIntFuncForBase()
 {
     return 6;
 }
 
-std::string FakeStringFuncForBase()
+std::string fakeStringFuncForBase()
 {
     return "Faked base string";
 }
@@ -38,11 +38,11 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockBaseClassVirtualMemberFunctionWhen
     BaseClassTest* base = new BaseClassTest();
 
     InjectorPP::Injector injector;
-    injector.WhenCalledVirtualMethod(base, "GetAnIntegerVirtual")
-        .WillExecute(FakeIntFuncForBase);
+    injector.whenCalledVirtualMethod(base, "getAnIntegerVirtual")
+        .willExecute(fakeIntFuncForBase);
 
     // Act
-    int actual = base->GetAnIntegerVirtual();
+    int actual = base->getAnIntegerVirtual();
 
     // Assert
     EXPECT_EQ(expected, actual);
@@ -58,11 +58,11 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
     BaseClassTest* derived = new SubClassTest();
 
     InjectorPP::Injector injector;
-    injector.WhenCalledVirtualMethod(derived, "GetAnIntegerVirtual")
-        .WillExecute(FakeIntFuncForDerived);
+    injector.whenCalledVirtualMethod(derived, "getAnIntegerVirtual")
+        .willExecute(fakeIntFuncForDerived);
 
     // Act
-    int actual = derived->GetAnIntegerVirtual();
+    int actual = derived->getAnIntegerVirtual();
 
     // Assert
     EXPECT_EQ(expected, actual);
@@ -75,16 +75,14 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockBaseClassVirtualMemberFunctionRetu
 {
     // Prepare
     std::string expected = "Faked base string";
-    BaseClassTest* base = new BaseClassTest();
-
-    std::string a1 = base->GetStringVirtual();
+    BaseClassTest* base = new BaseClassTest();    
 
     InjectorPP::Injector injector;
-    injector.WhenCalledVirtualMethod(base, "GetStringVirtual")
-        .WillExecute(FakeStringFuncForBase);
+    injector.whenCalledVirtualMethod(base, "getStringVirtual")
+        .willExecute(fakeStringFuncForBase);
 
     // Act
-    std::string actual = base->GetStringVirtual();
+    std::string actual = base->getStringVirtual();
 
     // Assert
     EXPECT_EQ(expected, actual);

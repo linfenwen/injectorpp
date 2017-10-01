@@ -26,7 +26,7 @@ namespace InjectorPP
     class BehaviorChangerFactory
     {
     public:
-        static BehaviorChanger* Create();
+        static BehaviorChanger* create();
 
     private:
         BehaviorChangerFactory();

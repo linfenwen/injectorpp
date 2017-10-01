@@ -16,7 +16,7 @@ namespace InjectorPP
 
         ~SymbolInfoHelper();
 
-        PSYMBOL_INFO AllocSymbol(int nameLen = MAX_SYM_NAME);
+        PSYMBOL_INFO allocSymbol(int nameLen = MAX_SYM_NAME);
 
     private:
         SymbolInfoHelper(const SymbolInfoHelper&);

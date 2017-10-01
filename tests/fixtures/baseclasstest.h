@@ -11,19 +11,19 @@ public:
 
     virtual ~BaseClassTest();
 
-    virtual int GetAnIntegerVirtual();
+    virtual int getAnIntegerVirtual();
 
-    virtual std::string GetStringVirtual();
+    virtual std::string getStringVirtual();
 
-    int GetAnInteger();
+    int getAnInteger();
 
-    std::string GetAString();
+    std::string getAString();
 
-    std::string* GetAStringPointer();
+    std::string* getAStringPointer();
 
-    Address GetAnAddress();
+    Address getAnAddress();
 
-    static Address GetAnAddressStatic();
+    static Address getAnAddressStatic();
 };
 
 #endif
