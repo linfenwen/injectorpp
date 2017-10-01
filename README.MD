@@ -6,22 +6,22 @@ Injector++ is a library to help you fake virtual/non-virtual methods, static met
 
 ## How to use
 
-## Prerequisites
+### Prerequisites
 
-### Windows
+#### Windows
 - Injector++ only supports x86 Windows by now.
 - Injector++ needs to retrieve information from pdb, therefore please:
 - In Visual Studio, open project property dialog, select Configuration Properties -> Linker -> Debugging, change `Generate Debug Info` to `Debug`.
 - Add `dbgHelp.lib` as dependency in your test project setting.
 - Project property dialog -> Linker -> General -> Enable Incremental Linking -> `No (/INCREMENTAL:NO)`.
 
-### Linux
+#### Linux
 In progress.
 
-### Mac OS
+#### Mac OS
 In progress.
 
-## Mock global functions
+### Mock global functions
 
 Below example fakes `fooReturnString` by using `fakeFooReturnString`:
 
@@ -56,7 +56,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeGlobalStringFunctionWhenCalled)
 
 ```
 
-## Mock non-virtual methods
+### Mock non-virtual methods
 
 Below example fakes `BaseClassTest::getAnInteger()` by using `fakeFunc()`:
 
@@ -92,7 +92,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeIntFunctionWhenCalled)
 
 ```
 
-## Mock virtual methods
+### Mock virtual methods
 Injector++ supports virtual method mocking (Amazing, huh?). Below is a simple example:
 
 ```cpp
@@ -125,7 +125,7 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
 
 ```
 
-## Mock static methods
+### Mock static methods
 Injector++ supports static method mocking. Below is a simple example:
 
 ```cpp
