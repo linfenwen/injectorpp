@@ -4,6 +4,8 @@
 #include <Windows.h>
 #include <vector>
 #include "originalfuncasm.h"
+#include "functiontype.h"
+#include "functionreturntype.h"
 
 namespace InjectorPP
 {
@@ -13,8 +15,8 @@ namespace InjectorPP
         BehaviorChanger();
         virtual ~BehaviorChanger();
 
-        // A magic function to change the function behavior at runtime
-        virtual void ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, int functionType, int returnType) = 0;
+        // A magic function to change the function behavior at runtime.
+        virtual void ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, FunctionType functionType, FunctionReturnType returnType) = 0;
 
         virtual void DirectWriteToFunction(ULONG64 funcAddress, const byte* asmCode, size_t asmCodeSize);
     private:

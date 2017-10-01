@@ -11,7 +11,7 @@ namespace InjectorPP
         X64WindowsBehaviorChanger();
         virtual ~X64WindowsBehaviorChanger();
 
-        virtual void ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, int functionType, int returnType);
+        virtual void ReplaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, FunctionType functionType, FunctionReturnType returnType);
 
     private:
         X64WindowsBehaviorChanger(const X64WindowsBehaviorChanger&);
