@@ -33,6 +33,15 @@ public:
         return addr;
     }
 
+    static Address fakeGetAnAddressStatic()
+    {
+        Address addr;
+        addr.setAddressLine("fakeAddressLine");
+        addr.setZipCode("fakeZipCode");
+
+        return addr;
+    }
+
 protected:
     virtual void SetUp()
     {
@@ -110,8 +119,8 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeGlobalStringFunctionWhenCalled)
 
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
 {
-	BaseClassTest b1;
-	std::string aa = b1.getAString();
+	//BaseClassTest b1;
+	//std::string aa = b1.getAString();
 
     // Prepare
     std::string expected = "Fake string func";
@@ -161,7 +170,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefined
     InjectorPP::Injector injector;
 
     injector.whenCalled(INJECTORPP_STATIC_MEMBER_FUNCTION(BaseClassTest::getAnAddressStatic))
-        .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeGetAnAddress));
+        .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeGetAnAddressStatic));
 
     // Act
     Address actual = BaseClassTest::getAnAddressStatic();
