@@ -20,7 +20,7 @@ std::string BaseClassTest::getStringVirtual()
 
 int BaseClassTest::getAnInteger()
 {
-	return -1;
+    return -1;
 }
 
 std::string fakefunc()
