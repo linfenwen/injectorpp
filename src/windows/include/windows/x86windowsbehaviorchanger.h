@@ -11,10 +11,12 @@ namespace InjectorPP
         X86WindowsBehaviorChanger();
         virtual ~X86WindowsBehaviorChanger();
 
-        virtual void replaceFunction(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, OriginalFuncASM* originalFuncAsm, FunctionType functionType, FunctionReturnType returnType);
+    protected:
+        virtual void generateToInjectAsmCode(ULONG64 sourceFuncAddress, ULONG64 targetFuncAddress, FunctionType functionType, FunctionReturnType returnType, std::vector<byte>& asmCode);
 
     private:
         X86WindowsBehaviorChanger(const X86WindowsBehaviorChanger&);
+        X86WindowsBehaviorChanger& operator=(const X86WindowsBehaviorChanger&);
     };
 }
 

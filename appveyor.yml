@@ -3,6 +3,9 @@ image:
 - Visual Studio 2013
 - Visual Studio 2015
 - Visual Studio 2017
+environment:
+  matrix:
+  - INJECTOR_BUILD_VS_VERSION: $(APPVEYOR_BUILD_WORKER_IMAGE)
 build_script:
 - cmd: .\build.cmd
 test: off

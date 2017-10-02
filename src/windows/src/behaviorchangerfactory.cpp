@@ -2,6 +2,8 @@
 #include "windows/behaviorchangerfactory.h"
 #ifdef WINENVIRONMENT32
 #include "windows/x86windowsbehaviorchanger.h"
+#else
+#include "windows/x64windowsbehaviorchanger.h"
 #endif
 
 namespace InjectorPP
@@ -19,7 +21,7 @@ namespace InjectorPP
 #ifdef WINENVIRONMENT32
         return new X86WindowsBehaviorChanger();
 #else
-        throw std::logic_error("No supported BehaviorChanger found for current environment.");
+        return new X64WindowsBehaviorChanger();
 #endif
     }
 }
