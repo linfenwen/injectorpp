@@ -9,7 +9,6 @@ Injector++ is a library to help you fake virtual/non-virtual methods, static met
 ### Prerequisites
 
 #### Windows
-- Injector++ only supports x86 Windows by now.
 - Injector++ needs to retrieve information from pdb, therefore please:
 - In Visual Studio, open project property dialog, select Configuration Properties -> Linker -> Debugging, change `Generate Debug Info` to `Debug`.
 - Add `dbgHelp.lib` as dependency in your test project setting.
@@ -83,7 +82,7 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeIntFunctionWhenCalled)
     BaseClassTest b = BaseClassTest();
 
     // Act
-    // FakeFunc will be executed!
+    // fakeFunc will be executed!
     int actual = b.getAnInteger();
 
     // Assert
@@ -97,7 +96,7 @@ Injector++ supports virtual method mocking (Amazing, huh?). Below is a simple ex
 
 ```cpp
 
-int FakeIntFuncForDerived()
+int fakeIntFuncForDerived()
 {
     return 2;
 }
@@ -113,7 +112,7 @@ TEST_F(FakeClassVirtualMethodTestFixture, MockDerivedClassVirtualMemberFunctionW
         .willExecute(fakeIntFuncForDerived);
 
     // Act
-    // FakeIntFuncForDerived() will be exectued!
+    // fakeIntFuncForDerived() will be exectued!
     int actual = derived->getAnIntegerVirtual();
 
     // Assert
@@ -130,7 +129,7 @@ Injector++ supports static method mocking. Below is a simple example:
 
 ```cpp
 
-Address FakeGetAnAddress()
+static Address fakeGetAnAddressStatic()
 {
     Address addr;
     addr.setAddressLine("fakeAddressLine");
@@ -149,10 +148,10 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStaticFunctionReturnUserDefined
     InjectorPP::Injector injector;
 
     injector.whenCalled(INJECTORPP_STATIC_MEMBER_FUNCTION(BaseClassTest::getAnAddressStatic))
-        .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeGetAnAddress));
+        .willExecute(INJECTORPP_MEMBER_FUNCTION(FakeClassNonVirtualMethodTestFixture::fakeGetAnAddressStatic));
 
     // Act
-    // FakeGetAnAddress will be executed!
+    // fakeGetAnAddressStatic will be executed!
     Address actual = BaseClassTest::getAnAddressStatic();
 
     // Assert
@@ -166,10 +165,9 @@ There's a headache of C++ unit testing - No way to abstract the legacy code. As 
 
 Injector++ intends to resolve the headache. Its goal is to make static method, non-virtual method and global functions testable without changing your production code. To accomplish this we still have to:
 
-1. Add x64 platform support.
-2. Add rich mock helper functions (e.g, return value expectation, input parameter mock, exception expectation...).
-3. Add Linux support.
-4. Adapt to mainstream unit test runners.
+1. Add rich mock helper functions (e.g, return value expectation, input parameter mock, exception expectation...).
+2. Add Linux support.
+3. Adapt to mainstream unit test runners.
 
 ## Contribute
 Welcome to help Injector++. You can submit bugs, suggestions and feature requests to the issue tracker, or send me pull request. Happy coding & testing!
