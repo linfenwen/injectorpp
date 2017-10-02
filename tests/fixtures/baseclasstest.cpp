@@ -23,14 +23,9 @@ int BaseClassTest::getAnInteger()
     return -1;
 }
 
-std::string fakefunc()
-{
-	return "fake";
-}
-
 std::string BaseClassTest::getAString()
 {
-	return fakefunc();
+    return "Get string.";
 }
 
 std::string* BaseClassTest::getAStringPointer()

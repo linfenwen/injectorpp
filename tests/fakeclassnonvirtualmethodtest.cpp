@@ -119,9 +119,6 @@ TEST_F(FakeClassNonVirtualMethodTestFixture, FakeGlobalStringFunctionWhenCalled)
 
 TEST_F(FakeClassNonVirtualMethodTestFixture, FakeStringFunctionWhenCalled)
 {
-	//BaseClassTest b1;
-	//std::string aa = b1.getAString();
-
     // Prepare
     std::string expected = "Fake string func";
     InjectorPP::Injector injector;
